@@ -17,8 +17,8 @@
    		SELECT
 			T.typeID,
 			M.materialTypeID,
-			M.quantity,
-		FROM invtypes T
+			M.quantity
+		FROM invTypes T
 			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
 		WHERE T.typeID IN 
 		<foreach item="item" index="idList" collection="list"
@@ -31,7 +31,7 @@
 			T.typeID,
 			M.materialTypeID,
 			M.quantity
-		FROM invtypes T
+		FROM invTypes T
 			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
 		WHERE T.typeName IN 
 		<foreach item="item" index="nameList" collection="list"

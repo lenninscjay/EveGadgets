@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.priceutils.calls.EveCentralHandler;
+import org.priceutils.calls.FuzzworkHandler;
 import org.priceutils.displays.MarketStatTypeDisplay;
 import org.scrap.daos.ScrapDAO;
 import org.scrap.domain.IdAndQuantity;
@@ -65,7 +65,7 @@ public class ScrapController {
 //		ModelMap priceMap = null;
 		Map<Integer, Double> priceMap = new HashMap<Integer, Double>();
 		try{
-			ModelMap eveCentralMap = EveCentralHandler.getMarketStatDisplays(idList, marketList);
+			ModelMap eveCentralMap = FuzzworkHandler.getMarketStatDisplays(idList, marketList);
 			if(eveCentralMap != null && !eveCentralMap.isEmpty()){
 //				for(String i, Object o: eveCentralMap.entrySet()){
 //					
@@ -77,12 +77,9 @@ public class ScrapController {
 						Map<Object, Object> pm = (Map<Object, Object>) p;
 					}*/
 //					System.out.println("Marker 1 with id: " + id);
-					Map<Integer, MarketStatTypeDisplay> p = (Map<Integer, MarketStatTypeDisplay>) eveCentralMap.get(Integer.toString(id));
-//					System.out.println("p successfully converted: " + p.toString());
-					MarketStatTypeDisplay m = p.get(30000142);
-//					System.out.println("m successfully converted: " + m.toString());
-//					m.getBuy().getFivePercent();
-					priceMap.put(id, m.getBuy().getFivePercent());
+                    Map<Integer, Map<String, Map<String, Object>>> locations =
+                        (Map<Integer, Map<String, Map<String, Object>>>) eveCentralMap.get(id.toString());
+                    priceMap.put(id, ((Number) locations.get(30000142).get("buy").get("percentile")).doubleValue());
 				}
 			}
 		}catch(Exception e){

@@ -77,7 +77,7 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 //	console.log($scope.buildings);
 	
 	$scope.costByTier=[4,400,7200,60000,1300000];
-	$scope.volumeByTier=[0.01, 0.38, 1.5, 6, 100];
+	$scope.volumeByTier=[0.005, 0.19, 0.75, 3, 50];
 	$scope.cclevel=[{CPU:1675, Power:6000, Cost:0},
 	                     {CPU:7057, Power:9000, Cost:580000},
 	                     {CPU:12136, Power:12000, Cost:1510000},
@@ -546,8 +546,8 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 							= ({typeID:m.typeId,quantity:0});
 					}
 					if(m.typeId != sch.outputID){
-						this.importExport[m.typeId].quantity -= m.quantity * f.number 
-							/ (this.avgActiveCycles * f.avgActiveCycles);
+						this.importExport[m.typeId].quantity -= m.quantity * f.number * 3600
+                            / (sch.cycleTime * this.avgActiveCycles * f.avgActiveCycles);
 					}
 				}, this)
 			}
@@ -723,8 +723,8 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 							= ({typeID:m.typeId,quantity:0});
 					}
 					if(m.typeId != sch.outputID){
-						this.importExport[m.typeId].quantity -= m.quantity * f.number 
-							/ (this.avgActiveCycles * f.avgActiveCycles);
+						this.importExport[m.typeId].quantity -= m.quantity * f.number * 3600
+                            / (sch.cycleTime * this.avgActiveCycles * f.avgActiveCycles);
 					}
 				}, this)
 			}
@@ -821,6 +821,7 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 				$scope.updateTotalImportExportCost();
 			})
 			.error(function(data, status, headers, config){
+                $scope.marketError = 'Market prices unavailable. Please retry; previous totals are stale.';
 				console.error("populatePriceMapFromStatic failed with info: " + data + " " + status + " " 
 						+ headers + " " + config); 
 			});
@@ -833,15 +834,15 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 	$scope.importMarketSystem = 10000002;
 	$scope.exportMarketSystem = 10000002;
 	$scope.orderTypeList = ["buy", "sell"]; //ignoring all
-	$scope.marketStatTypeList = ["wavg", "avg", "median", "fivePercent", "max", "min"];
+	$scope.marketStatTypeList = ["wavg", "median", "percentile", "max", "min"];
 
 	$scope.im_orderType = "buy";
-	$scope.im_marketStatType = "fivePercent";
+	$scope.im_marketStatType = "percentile";
 	$scope.im_brokerfees = 1;
 	$scope.im_salestax = 1.5;
 	
 	$scope.ex_orderType = "buy";
-	$scope.ex_marketStatType = "fivePercent";
+	$scope.ex_marketStatType = "percentile";
 	$scope.ex_brokerfees = 1;
 	$scope.ex_salestax = 1.5;
 	
@@ -877,11 +878,11 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 //				console.log(io);
 				//marketHubList[exportMarketSystem]
 				if(io.quantity < 0){
-					var price = $scope.realMarketPrices[io.typeID][$scope.importMarketSystem][$scope.im_orderType][$scope.ex_marketStatType];
+					var price = $scope.realMarketPrices[io.typeID][$scope.importMarketSystem][$scope.im_orderType][$scope.im_marketStatType];
 					p.importCostValue += price * io.quantity * -1;
 				}
 				else if(io.quantity > 0){
-					var price = $scope.realMarketPrices[io.typeID][$scope.exportMarketSystem][$scope.ex_orderType][$scope.im_marketStatType];
+					var price = $scope.realMarketPrices[io.typeID][$scope.exportMarketSystem][$scope.ex_orderType][$scope.ex_marketStatType];
 					p.exportRevenueValue += price * io.quantity;
 				}
 				else{
@@ -962,13 +963,11 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 //		console.log("Export System " + $scope.exportMarketSystem + ": " + $scope.marketHubList[$scope.exportMarketSystem]);
 		
 		$scope.calledRemoteSuccessfully = false;
+        $scope.marketError = '';
 		var types = [];
 		$scope.updateTotalImportExport();
 		angular.forEach($scope.totalImportExport, function(ietype){
-			if(!($scope.realMarketPrices[ietype.typeID] && $scope.realMarketPrices[ietype.typeID][$scope.importMarketSystem]) 
-				|| !($scope.realMarketPrices[ietype.typeID] && $scope.realMarketPrices[ietype.typeID][$scope.exportMarketSystem])){
-				types.push(ietype.typeID);
-			}
+			types.push(ietype.typeID);
 		});
 		var systems = [];
 		if($scope.importMarketSystem == $scope.exportMarketSystem){
@@ -1014,6 +1013,7 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 //				$scope.updateTotalImportExportCost();
 			})
 			.error(function(data, status, headers, config){
+                $scope.marketError = 'Market prices unavailable. Please retry; previous totals are stale.';
 				console.log("populatePriceMap failed with info: " + data + " " + status + " " 
 						+ headers + " " + config); 
 			});
@@ -1024,20 +1024,25 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 	 * $scope.importMarketSystem = 30000142;
 	$scope.exportMarketSystem = 30000142;
 	$scope.orderTypeList = ["buy", "sell"]; //ignoring all
-	$scope.marketStatTypeList = ["wavg", "avg", "median", "fivePercent", "max", "min"];
+	$scope.marketStatTypeList = ["wavg", "median", "percentile", "max", "min"];
 
 	$scope.im_orderType = "buy";
-	$scope.im_marketStatType = "fivePercent";
+	$scope.im_marketStatType = "percentile";
 	$scope.im_brokerfees = 1;
 	$scope.im_salestax = 1.5;
 	
 	$scope.ex_orderType = "buy";
-	$scope.ex_marketStatType = "fivePercent";
+	$scope.ex_marketStatType = "percentile";
 	$scope.ex_brokerfees = 1;
 	$scope.ex_salestax = 1.5;
 	 */
 	
-	$scope.savePlanetJson = '';
+	function normalizeMarketStat(stat) {
+        if (stat === 'fivePercent') { return 'percentile'; }
+        if (stat === 'avg') { $scope.marketError = 'Saved average pricing is unavailable; using weighted average.'; return 'wavg'; }
+        return $scope.marketStatTypeList.indexOf(stat) >= 0 ? stat : 'percentile';
+    }
+    $scope.savePlanetJson = '';
 	$scope.generateSavePlanetJson = function(){
 		console.log("Inside generateSavePlanetJson");
 		var json = {};
@@ -1046,8 +1051,8 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 		if($scope.exportMarketSystem != 10000002){json.es = $scope.exportMarketSystem;}
 		if($scope.im_orderType != "buy"){json.io = $scope.im_orderType;}
 		if($scope.ex_orderType != "buy"){json.eo = $scope.ex_orderType;}
-		if($scope.im_marketStatType != "fivePercent"){json.im = $scope.im_marketStatType;}
-		if($scope.ex_marketStatType != "fivePercent"){json.ex = $scope.ex_marketStatType;}
+		if($scope.im_marketStatType != "percentile"){json.im = $scope.im_marketStatType;}
+		if($scope.ex_marketStatType != "percentile"){json.em = $scope.ex_marketStatType;}
 		if($scope.im_brokerfees != 1){json.ib = $scope.im_brokerfees;}
 		if($scope.ex_brokerfees != 1){json.eb = $scope.ex_brokerfees;}
 		if($scope.im_salestax != 1.5){json.it = $scope.im_salestax;}
@@ -1134,8 +1139,8 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 		if(json.es){$scope.exportMarketSystem = json.es;} else {$scope.exportMarketSystem = 10000002;}
 		if(json.io){$scope.im_orderType = json.io;} else {$scope.im_orderType = "buy";}
 		if(json.eo){$scope.ex_orderType = json.eo;} else {$scope.ex_orderType = "buy";}
-		if(json.im){$scope.im_marketStatType = json.im;} else {$scope.im_marketStatType = "fivePercent";}
-		if(json.em){$scope.ex_marketStatType = json.em;} else {$scope.ex_marketStatType = "fivePercent";}
+		if(json.im){$scope.im_marketStatType = normalizeMarketStat(json.im);} else {$scope.im_marketStatType = "percentile";}
+		if(json.em || json.ex){$scope.ex_marketStatType = normalizeMarketStat(json.em || json.ex);} else {$scope.ex_marketStatType = "percentile";}
 		if(json.ib){$scope.im_brokerfees = json.ib;} else {$scope.im_brokerfees = 1;}
 		if(json.eb){$scope.ex_brokerfees = json.eb;} else {$scope.ex_brokerfees = 1;}
 		if(json.it){$scope.im_salestax = json.it;} else {$scope.im_salestax = 1.5;}

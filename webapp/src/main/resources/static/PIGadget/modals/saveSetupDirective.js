@@ -104,7 +104,7 @@ app.controller('SaveSetupJsonController', function($scope, $modalInstance, displ
 
 app.controller('SaveSetupUrlController', function($scope, $modalInstance, planetApi, display){
 	$scope.display = '';
-	$scope.url = "http://EveGadgets.com/#/pi";
+	$scope.url = window.location.origin + window.location.pathname + "#/pi";
 //	$scope.url = "http://localhost:8081/#/pi";
 	
 	planetApi.saveSetup(display)
