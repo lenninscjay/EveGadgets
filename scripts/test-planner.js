@@ -37,3 +37,14 @@ const saved=scope.generateSavePlanetJson();
 assert.equal(saved.em,'max');assert.equal(saved.ex,undefined);
 scope.populateSetupFromJson(saved);assert.equal(scope.ex_marketStatType,'max');
 console.log('Planner checks passed: storage, volume, hourly inputs, runtime, tax, price selectors and save round-trip');
+
+// Reconstructed saves explicitly preserve zero rates and false flags.
+const zeroSave=JSON.parse(JSON.stringify(saved));
+zeroSave.ib=0;zeroSave.eb=0;zeroSave.it=0;zeroSave.et=0;
+zeroSave.pl[0].t=0;zeroSave.pl[0].l=0;zeroSave.pl[0].r=false;
+scope.populateSetupFromJson(zeroSave);
+assert.equal(scope.planets[0].taxRate,0);
+assert.equal(scope.planets[0].level,0);
+assert.equal(scope.planets[0].restrictPads,false);
+assert.equal(scope.im_brokerfees,0);assert.equal(scope.ex_brokerfees,0);
+console.log('Cross-frontend save checks passed: zero rates and false flags');

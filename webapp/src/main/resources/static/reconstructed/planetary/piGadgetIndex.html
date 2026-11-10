@@ -1,0 +1,88 @@
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-3 hidden-sm hidden-xs navbarColor" style="position: fixed; height:3000px; margin-top:-200px"></div>
+		<div id="piNavColumn navbarColor" class="col-md-3 col-sm-12">
+
+			<a class="btn btn-success btn-lg" ng-click="addPlanet()" style="display:block">Add Planet</a>
+			<ul class="nav nav-pills nav-stacked">
+				<h3 class="navSection">Info Views</h3>
+				<li ng-class="{'active' : activeView == 'INFOPANEL'}">
+					<a data-toggle="pill" ng-click="setActiveView('INFOPANEL'); Logic.loadOverviewTab()"
+					 class="nav-pills-condensed">
+						Setup Overview
+					</a>
+				</li>
+				<li ng-class="{'active' : activeView == 'MARKETPANEL'}">
+					<a data-toggle="pill" ng-click="setActiveView('MARKETPANEL'); Logic.loadMarketDetailsTab()"
+					 class="nav-pills-condensed">
+						Market Details
+						<span class="alertTooltip pull-right" ng-if="Logic.marketCallOngoing">
+							<i class="fa fa-refresh fa-spin"></i>
+						</span>
+					</a>
+				</li>
+				<h3 class="navSection">
+					<!-- <button class="btn btn-info" ng-click="addPlanet()">Add Planet</button> -->
+					Planets
+				</h3>
+				<li ng-repeat="p in Logic.planets track by $index" ng-class="{'active' : activeView == $index}">
+					<a data-toggle="pill" ng-click="setActiveView($index)" class="nav-pills-condensed">
+						{{p.name}}
+
+						<!-- Over CPU -->
+						<span class="alertTooltip pull-right" tooltip="CPU Overloaded!" ng-if="p.isCpuOverloaded()" tooltip-placement="bottom">
+							<i class="fa fa-code-fork"></i>
+						</span>
+						<!-- Over Grid -->
+						<span class="alertTooltip pull-right" tooltip="Power Overloaded!" ng-if="p.isGridOverloaded()" tooltip-placement="bottom">
+							<i class="fa fa-bolt"></i>
+						</span>
+						<!-- Short runtime -->
+						<span class="alertTooltip pull-right" tooltip="Run lasts {{p.runtime}} hours!" ng-if="p.isLowRuntime()" tooltip-placement="bottom">
+							<i class="fa fa-hourglass-o"></i>
+						</span>
+						<!-- Imports and 100% uptime -->
+						<span class="alertTooltip pull-right" tooltip="Factory planet with 100% uptime!" ng-if="p.isBadFactory()"
+								tooltip-placement="bottom">
+							<i class="fa fa-percent"></i>
+						</span>
+						<!-- No Launchpads -->
+						<span class="alertTooltip pull-right" tooltip="No Launchpads!" ng-if="p.isWithoutLaunchpads()" tooltip-placement="bottom">
+							<i class="fa fa-rocket"></i>
+						</span>
+					</a>
+				</li>
+
+			</ul>
+
+		</div>
+		<div class="col-md-9">
+			<div ng-switch on="activeView">
+			    <div ng-switch-when="HELP">
+			    	<eg-pi-welcome-page></eg-pi-welcome-page>
+				</div>
+			    <div ng-switch-when="INFOPANEL">
+			    	<eg-pi-infopanel></eg-pi-infopanel>
+			    </div>
+			    <div ng-switch-when="MARKETPANEL">
+			    	<eg-pi-marketpanel></eg-pi-marketpanel>
+			    </div>
+			    <div ng-switch-when="SAVE">
+			    	<eg-pi-savepanel></eg-pi-savepanel>
+			    </div>
+			    <div ng-switch-default>
+					<div ng-repeat="p in Logic.planets track by $index" ng-if="activeView == $index">
+						<eg-planet-creator></eg-planet-creator>
+					</div>
+			    </div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});
+</script>

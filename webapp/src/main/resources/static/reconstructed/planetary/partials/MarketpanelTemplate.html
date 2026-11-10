@@ -1,0 +1,256 @@
+<div class="container-fluid">
+<p class="alert alert-danger" ng-if="Logic.marketError">{{Logic.marketError}}</p>
+<p ng-if="Logic.marketCallOngoing">Loading prices…</p>
+<p>Planet detail values are per active hour; system totals account for utilization.</p>
+	<div class="row" style="padding-top:20px">
+			<div class="panel panel-default">
+				<div class="panel-heading"><h4>System Totals</h4></div>
+				<div class="panel-body">
+					<div class="col-md-4">
+						<form class="form-horizontal">
+<label>Export Market <select class="form-control" ng-model="Logic.exportMarketId"
+ ng-options="key as value for (key,value) in MARKETS" ng-change="Logic.getMarketInfo()"></select></label>
+<label>Import Statistic <select class="form-control" ng-model="Logic.importStatistic"
+ ng-options="s for s in Logic.statistics" ng-change="Logic.refreshSystemMarketTotals()"></select></label>
+<label>Export Statistic <select class="form-control" ng-model="Logic.exportStatistic"
+ ng-options="s for s in Logic.statistics" ng-change="Logic.refreshSystemMarketTotals()"></select></label>
+<p>Percentile is Fuzzwork's percentile; wavg is its weighted average. Prices share the server's persistent 30-minute cache.</p>
+<button type="button" class="btn btn-default" ng-click="Logic.getMarketInfo()" ng-disabled="Logic.marketCallOngoing">Refresh prices</button>
+
+							<div class="form-group">
+								<label for="marketLocationInput" class="col-xs-5 control-label">Import Market</label>
+								<div class="col-xs-7">
+									<select class="input form-control" style="width:auto; font-size:80%"
+										ng-model="Logic.marketId"
+										ng-options="key as value for (key, value) in MARKETS | orderBy:value"
+										ng-change="Logic.getMarketInfo(Logic.marketId)"></select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="buyOrSellInput" class="col-xs-7 control-label">Import Order Type</label>
+								<div class="col-xs-5">
+									<select class="form-control" id="buyOrSellInput" ng-model="Logic.importOrderType"
+										ng-change="Logic.refreshSystemMarketTotals()" style="width:auto">
+										<option value="buy">BUY</option>
+										<option value="sell">SELL</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="buyOrSellInput" class="col-xs-7 control-label">Export Order Type</label>
+								<div class="col-xs-5">
+									<select class="form-control" id="buyOrSellInput" ng-model="Logic.exportOrderType"
+										ng-change="Logic.refreshSystemMarketTotals()" style="width:auto">
+										<option value="buy">BUY</option>
+										<option value="sell">SELL</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="salestaxInput" class="col-xs-7 control-label">Sales Tax</label>
+								<div class="col-xs-5">
+									<input type="number" class="form-control" id="salestaxInput" ng-model="Logic.taxRate"
+										ng-change="Logic.refreshMarketFees()">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="brokerfeesInput" class="col-xs-7 control-label">Import Broker Fees</label>
+								<div class="col-xs-5">
+									<input type="number" class="form-control" id="brokerfeesInput" ng-model="Logic.importBrokerFees"
+										ng-change="Logic.refreshMarketFees()">
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="brokerfeesInput" class="col-xs-7 control-label">Export Broker Fees</label>
+								<div class="col-xs-5">
+									<input type="number" class="form-control" id="brokerfeesInput" ng-model="Logic.exportBrokerFees"
+										ng-change="Logic.refreshMarketFees()">
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="col-md-8" ng-if="Logic.pricesReady">
+						<table class="table table-bordered table-condensed"><!--  style="text-align:right"> -->
+							<tr>
+								<th>Item</th>
+								<th>System Vol/Day</th>
+								<th>Open Order Volume</th>
+								<th>Market Price</th>
+								<th>Isk/Hour</th>
+							</tr>
+							<tr ng-repeat="item in Logic.System.importExports" ng-if="item.quantity > 0" class="exportColors">
+								<td style="text-align:left">{{DATA.itemDetails[item.id].name}}</td>
+								<td class="price">{{item.quantity * 24 | number}}</td>
+								<td class="price">{{Logic.marketprices[item.id][Logic.exportMarketId][Logic.exportOrderType].volume | number}}</td>
+								<td class="price">{{Logic.marketprices[item.id][Logic.exportMarketId][Logic.exportOrderType][Logic.exportStatistic] | currency:"":2}}</td>
+								<td class="price">
+									{{Logic.marketprices[item.id][Logic.exportMarketId][Logic.exportOrderType][Logic.exportStatistic] * item.quantity  | currency:"":2}}
+								</td>
+							</tr>
+							<tr ng-repeat="item in Logic.System.importExports" ng-if="item.quantity < 0" class="importColors">
+								<td>{{DATA.itemDetails[item.id].name}}</td>
+								<td class="price">{{item.quantity * -24 | number}}</td>
+								<td class="price">{{Logic.marketprices[item.id][Logic.marketId][Logic.importOrderType].volume | number}}</td>
+								<td class="price">{{Logic.marketprices[item.id][Logic.marketId][Logic.importOrderType][Logic.importStatistic] | currency:"":2}}</td>
+								<td class="price">
+									{{Logic.marketprices[item.id][Logic.marketId][Logic.importOrderType][Logic.importStatistic] * item.quantity *-1  | currency:"":2}}
+								</td>
+							</tr>
+							<tr>
+								<td colspan="4">
+									Total Hourly Export Revenue
+								</td>
+								<td class="price">{{Logic.totalHourlyExportRevenue | currency:"":2}}</td>
+							</tr>
+							<tr>
+								<td colspan="4">
+									Export Market Fees
+								</td>
+								<td class="price">{{Logic.totalHourlyExportMarketFees | currency:"":2}}</td>
+							</tr>
+							<tr>
+								<td colspan="4">
+									Total Hourly Import Cost
+								</td>
+								<td class="price">{{Logic.totalHourlyImportCost | currency:"":2}}</td>
+							</tr>
+							<tr>
+								<td colspan="4">
+									Import Market Fees
+								</td>
+								<td class="price">{{Logic.totalHourlyImportMarketFees | currency:"":2}}</td>
+							</tr>
+							<tr>
+								<td colspan="4">
+									Total Hourly Customs Tax
+								</td>
+								<td class="price">{{Logic.totalHourlyCustomsTax | currency:"":2}}</td>
+							</tr>
+							<tr>
+								<td colspan="4">
+									Profit Per Hour
+								</td>
+								<td class="price" style="font-style: bold">
+									{{Logic.totalHourlyExportRevenue - Logic.totalHourlyImportCost
+										- Logic.totalHourlyExportMarketFees - Logic.totalHourlyImportMarketFees
+										- Logic.totalHourlyCustomsTax | currency:"":2}}
+								</td>
+							</tr>
+							<tr>
+								<td colspan="4">
+									Average Profit Per Hour
+								</td>
+								<td class="price">
+									{{(Logic.totalHourlyExportRevenue - Logic.totalHourlyImportCost
+										- Logic.totalHourlyExportMarketFees - Logic.totalHourlyImportMarketFees
+										- Logic.totalHourlyCustomsTax) / Logic.planets.length | currency:"":2}}
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+	</div>
+
+<div class="row" ng-if="Logic.pricesReady">
+    <div class="panel panel-default">
+    <div class="panel-heading">Profit per planet (per active hour)</div>
+    <div class="panel-body">
+                                <table class="table table-bordered table-condensed">
+                                            <tr>
+                                                    <th>Planet</th>
+                                                    <th>ISK per active hour</th>
+                                                                <th>ISK per 24 active hours</th>
+                                                        </tr>
+                                                        <tr ng-repeat="planet in Logic.planets">
+                                                                <td style="text-align:left">{{planet.name}}</td>
+                                                                    <td class="price">
+                                                                        {{planet.exportRevenue - planet.importCost - planet.exportMarketFees - planet.importMarketFees
+                                                                         - (planet.importTaxes + planet.exportTaxes) | currency:"":2}}
+                                                                        </td>
+                                                                        <td class="price">
+                                                                            {{24 * (planet.exportRevenue - planet.importCost - planet.exportMarketFees - planet.importMarketFees
+                                                                             - (planet.importTaxes + planet.exportTaxes)) | currency:"":2}}
+                                                                        </td>
+                                                       </tr>
+        </table>
+    </div>
+    </div>
+    </div>
+
+
+	<div class="row" ng-repeat="planet in Logic.planets" ng-if="Logic.pricesReady">
+			<div class="panel panel-default">
+				<div class="panel-heading">{{planet.name}}</div>
+				<div class="panel-body">
+					<!-- <p>Imports and POCO taxes</p>
+					<p>Exports and POCO taxes</p>
+					<p>Profit before market fees</p>
+					<p>Export Market fees</p>
+					<p>Import Market fees</p>
+					<p>Profit after market fees</p> -->
+					<div class="row" ng-if="Logic.pricesReady">
+						<div class="col-md-6">
+							<table class="table table-condensed">
+								<tr ng-repeat="item in planet.ioDetails" ng-if="item.quantity > 0" class="exportColors">
+									<td>{{DATA.itemDetails[item.id].name}}</td>
+									<td class="price">{{item.quantity | number}}</td>
+									<td class="price">
+										{{Logic.marketprices[item.id][Logic.exportMarketId][Logic.exportOrderType][Logic.exportStatistic] * item.quantity | currency:"":2}}
+									</td>
+								</tr>
+								<tr ng-repeat="item in planet.ioDetails" ng-if="item.quantity < 0" class="importColors">
+									<td>{{DATA.itemDetails[item.id].name}}</td>
+									<td class="price">{{item.quantity * -1 | number}}</td>
+									<td class="price">
+										{{Logic.marketprices[item.id][Logic.marketId][Logic.importOrderType][Logic.importStatistic] * item.quantity *-1 | currency:"":2}}
+									</td>
+								</tr>
+							</table>
+						</div>
+						<div class="col-md-6">
+							<table class="table table-condensed" style="text-align: right">
+								<tr>
+									<td colspan="2">Export Revenue</td>
+									<td class="price">{{planet.exportRevenue | currency:"":2}}</td>
+								</tr>
+								<tr>
+									<td colspan="2">Import Cost</td>
+									<td class="price">{{planet.importCost | currency:"":2}}</td>
+								</tr>
+								<tr>
+									<td colspan="2">POCO Taxes</td>
+									<td class="price">
+										{{planet.importTaxes + planet.exportTaxes | currency:"":2}}
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">Planet Profit before Market Fees</td>
+									<td class="price">
+										{{planet.exportRevenue - planet.importCost
+										 - (planet.importTaxes + planet.exportTaxes) | currency:"":2}}
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">Export Market Fees</td>
+									<td class="price">{{planet.exportMarketFees | currency:"":2}}</td>
+								</tr>
+								<tr>
+									<td colspan="2">Import Market Fees</td>
+									<td class="price">{{planet.importMarketFees | currency:"":2}}</td>
+								</tr>
+								<tr>
+									<td colspan="2">Independent Planet Profit</td>
+									<td class="price">
+										{{planet.exportRevenue - planet.importCost
+										- planet.exportMarketFees - planet.importMarketFees
+										- (planet.importTaxes + planet.exportTaxes) | currency:"":2}}
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</div>

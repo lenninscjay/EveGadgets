@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="gadgets">
+<head>
+	<meta charset="utf-8">
+	<title>EVE PI planner</title>
+	<link rel="shortcut icon" type="image/png" href="/images/fullyTrained.png">
+	<meta name="description" content="EVE Planetary Industry (PI) planner and calculator">
+	<meta name="author" content="Kurt Midas">
+	<meta name="keywords" content="eve online, planetary interaction, Planetary Industry, PI, PI Chain, PI tool">
+	<link rel="stylesheet" href="/css/angular-bootstrap.css">
+<script src="/js/angular-bootstrap.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+	<link href='https://fonts.googleapis.com/css?family=Coda' rel='stylesheet' type='text/css'>
+
+	<link rel="stylesheet" href="css/app.css">
+
+	<!-- Global Imports and Configs (before the references) -->
+	<script src="js/marketIDs.js" type="text/javascript"></script>
+	<script src="js/MarketService.js" type="text/javascript"></script>
+
+	<!-- Planet Gadget Stuff -->
+	<script src="planetary/services/PlanetData.js" type="text/javascript"></script>
+	<script src="planetary/services/Planet.js" type="text/javascript"></script>
+	<script src="planetary/services/Persist.js" type="text/javascript"></script>
+	<script src="planetary/services/Logic.js" type="text/javascript"></script>
+	<script src="planetary/controller/PlanetController.js" type="text/javascript"></script>
+
+	<!-- Planet Gadget Directives -->
+	<script src="planetary/directives/planetDirective.js" type="text/javascript"></script>
+	<script src="planetary/directives/factoryDirective.js" type="text/javascript"></script>
+	<script src="planetary/directives/HelpDirective.js" type="text/javascript"></script>
+	<script src="planetary/directives/MarketpanelDirective.js" type="text/javascript"></script>
+	<script src="planetary/directives/InfopanelDirective.js" type="text/javascript"></script>
+	<script src="planetary/directives/SaveDirective.js" type="text/javascript"></script>
+
+	<!-- Scrap Gadget Stuff -->
+
+	<!-- Global Imports and Configs (after the references) -->
+	<script src="js/conf.js" type="text/javascript"></script>
+
+	<!-- Required Libraries and Angular and stuff -->
+	<!--
+	<link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("/images/fullyTrained.png")">
+
+	<link rel="stylesheet" href="@routes.Assets.versioned("lib/font-awesome/css/font-awesome.min.css")"/>
+
+	<script src="@routes.Assets.versioned("lib/angular-ui-bootstrap/ui-bootstrap.min.js")" type="text/javascript"></script>
+	<script src="@routes.Assets.versioned("lib/angular-ui-bootstrap/ui-bootstrap-tpls.min.js")" type="text/javascript"></script>
+	-->
+</head>
+
+<body ng-controller="baseController" class="generalBackgroundColor generalTextColor">
+	<nav class="navbar navbar-default navbar-static-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand">EVE Planetary Industry (PI) planner and profit calculator</a>
+			</div>
+
+                        <span class="btn-group pull-right" style="padding-top: 8px; padding-bottom: 8px;">
+                            <button type="button" class="btn btn-success btn-md" ng-click="baseMenu.save()">Save current setup</button>
+                        </span>
+		</div>
+	</nav>
+
+	<p class="alert alert-danger" ng-if="routeError">{{routeError}}</p>
+<a href="/#/pi">Classic planner</a> · Reconstructed eve-pi.com interface
+<div id="gadgetsView" ng-view></div>
+
+</body>
+
+</html>

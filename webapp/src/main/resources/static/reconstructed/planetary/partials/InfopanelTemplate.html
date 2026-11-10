@@ -1,0 +1,213 @@
+<div class="container-fluid">
+	<div class="row" style="padding-top:20px">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4>System Totals</h4>
+				</div>
+				<div class="panel-body">
+					<div class="col-md-6 col-sm-12">
+						<div class="row">
+							<div class="col-xs-6">
+								<h4>Shortest Runtime:</h4> {{Logic.System.runtimeInfo.minRuntime | number:1}} hours
+							</div>
+							<div class="col-xs-12">
+								<h4>Total Setup Cost:</h4>
+								<span class="importColors">{{Logic.System.setupCost | number:0}} isk</span>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6">
+								<h4>Total Import Taxes:</h4>
+								<span class="importColors">{{Logic.System.taxes.importTaxes | number:2}} isk/hour</span>
+							</div>
+							<div class="col-xs-6">
+								<h4>Total Export Taxes:</h4>
+								<span class="importColors">{{Logic.System.taxes.exportTaxes | number:2}} isk/hour</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-6 col-sm-12">
+					  <p>
+					  <table class="table table-bordered table-condenseCelld">
+					    <thead>
+					      <tr>
+					        <th>Planet Name</th>
+					        <th class="denseCell">
+					        	<span class="alertTooltip" tooltip="Temperate" tooltip-placement="top">T</span>
+				        	</th>
+							<th class="denseCell">
+								<span class="alertTooltip" tooltip="Barren" tooltip-placement="top">B</span>
+							</th>
+							<th class="denseCell">
+								<span class="alertTooltip" tooltip="Ice" tooltip-placement="top">I</span>
+							</th>
+							<th class="denseCell">
+								<span class="alertTooltip" tooltip="Storm" tooltip-placement="top">S</span>
+							</th>
+							<th class="denseCell">
+								<span class="alertTooltip" tooltip="Plasma" tooltip-placement="top">P</span>
+							</th>
+							<th class="denseCell">
+								<span class="alertTooltip" tooltip="Gas" tooltip-placement="top">G</span>
+							</th>
+							<th class="denseCell">
+								<span class="alertTooltip" tooltip="Lava" tooltip-placement="top">L</span>
+							</th>
+							<th class="denseCell">
+								<span class="alertTooltip" tooltip="Ocean" tooltip-placement="top">O</span>
+							</th>
+					      </tr>
+					    </thead>
+
+
+					    <tbody>
+						  <tr ng-repeat="p in Logic.planets">
+						  	<td>{{p.name}}</td>
+						    <td class="denseCell">
+								<i class="glyphicon glyphicon-ok-circle" ng-if="p.allowedPlanets.indexOf('11') != -1"></i>
+							</td>
+							<td class="denseCell">
+								<i class="glyphicon glyphicon-ok-circle" ng-if="p.allowedPlanets.indexOf('2016') != -1"></i>
+							</td>
+							<td class="denseCell">
+								<i class="glyphicon glyphicon-ok-circle" ng-if="p.allowedPlanets.indexOf('12') != -1"></i>
+							</td>
+							<td class="denseCell">
+								<i class="glyphicon glyphicon-ok-circle" ng-if="p.allowedPlanets.indexOf('2017') != -1"></i>
+							</td>
+							<td class="denseCell">
+								<i class="glyphicon glyphicon-ok-circle" ng-if="p.allowedPlanets.indexOf('2063') != -1"></i>
+							</td>
+							<td class="denseCell">
+								<i class="glyphicon glyphicon-ok-circle" ng-if="p.allowedPlanets.indexOf('13') != -1"></i>
+							</td>
+							<td class="denseCell">
+								<i class="glyphicon glyphicon-ok-circle" ng-if="p.allowedPlanets.indexOf('2015') != -1"></i>
+							</td>
+							<td class="denseCell">
+								<i class="glyphicon glyphicon-ok-circle" ng-if="p.allowedPlanets.indexOf('2014') != -1"></i>
+							</td>
+						  </tr>
+					    </tbody>
+					  </table>
+					  </p>
+
+</div>
+				<table class="table table-bordered table-condensed table-responsive"
+					style="display:block">
+					<tr>
+						<th><span>Planet Name</span></th>
+						<th ng-repeat="item in Logic.System.importExports">
+							<span class="alertTooltip" tooltip="{{DATA.itemDetails[item.id].name}}"
+								tooltip-placement="top">
+
+								<!-- Use images -->
+							</span>
+						</th>
+						<th><span>Import Tax/Hr</span></th>
+						<th><span>Export Tax/Hr</span></th>
+						<th><span>Max Run</span></th>
+					</tr>
+					<tr ng-repeat="p in Logic.planets">
+						<td>{{p.name}}</td>
+						<td ng-repeat="item in Logic.System.importExports">
+							<div ng-repeat="io in p.ioDetails" ng-if="io.id == item.id">
+								<span ng-class="io.quantity > 0 ? 'exportColors' : 'importColors'">{{io.quantity}}</span>
+								<!-- bad -->
+							</div>
+						</td>
+						<td><span>{{p.importTaxes | number:2}} isk</span></td>
+						<td><span>{{p.exportTaxes | number:2}} isk</span></td>
+						<td>
+							<span ng-class="p.runtime == Logic.System.runtimeInfo.minRuntime ? ['strong', 'text-danger'] : ''">
+								{{p.runtime}}hr
+							</span>
+						</td> <!-- ng-class color min -->
+					</tr>
+					<tr> <!-- Break of some sort --> </tr>
+					<tr>
+						<td>Totals</td>
+						<td ng-repeat="item in Logic.System.importExports">
+							<span ng-class="item.quantity > 0 ? 'exportColors' : 'importColors'">{{item.quantity}}</span>
+						</td>
+						<td>
+							<span>{{Logic.System.taxes.importTaxes | number:2}} isk</span>
+						</td>
+						<td>
+							<span>{{Logic.System.taxes.exportTaxes | number:2}} isk</span>
+						</td>
+					</tr>
+				</table>
+				</div>
+
+			</div>
+
+			<div class="row" ng-repeat="p in Logic.planets" style="padding-left: 15px; padding-right: 15px;">
+				<div class="panel panel-default">
+				<div class="panel-heading"><h4>Warnings and Info for <span ng-class="text-primary">{{p.name}}</span></h4></div>
+				<div class="panel-body">
+				<div class="col-md-6 col-sm-12">
+					 <div class="row">
+						 <div class="col-xs-6">
+						 	<h5>Import Taxes/Hour:</h5> {{p.importTaxes | number:2}}
+						 </div>
+						 <div class="col-xs-6">
+						 	<h5>Export Taxes/Hour:</h5> {{p.exportTaxes | number:2}}
+						 </div>
+					 </div>
+					 <div class="row">
+						 <div class="col-xs-6">
+						 	<h5>Limited by:
+							 	<span ng-show="p.importVolume > p.exportVolume">Imports</span>
+							 	<span ng-hide="p.importVolume > p.exportVolume">Exports</span>
+						 	</h5>
+						 </div>
+					 </div>
+					 <div class="col-xs-6" ng-show="p.isCpuOverloaded()">
+					 	<div class="text-danger">CPU Overloaded!</div>
+					 </div>
+					 <div class="col-xs-6" ng-show="p.isGridOverloaded()">
+					 	<div class="text-danger">Power Overloaded!</div>
+					 </div>
+					 <div class="col-xs-6" ng-show="p.isLowRuntime()">
+					 	<div class="text-danger">Run lasts {{p.runtime}} hours!</div>
+					 </div>
+					 <div class="col-xs-6" ng-show="p.isBadFactory()">
+					 	<div class="text-danger">Imports and 100% uptime!</div>
+					 </div>
+					 <div class="col-xs-6" ng-show="p.isWithoutLaunchpads()">
+					 	<div class="text-danger">Has no launchpads!</div>
+					 </div>
+				</div>
+				<div class="col-md-6 col-sm-12">
+					<h2 class="headerTextColor">Imports and Exports</h2>
+					<table class="table table-condensed" style="border-top:0px">
+						<tr>
+							<th>Item</th>
+							<th>Hourly</th>
+							<th>System AFK</th>
+							<th>Planet Max</th>
+						</tr>
+						<tr ng-repeat="item in p.ioDetails" ng-if="item.quantity < 0" class="importColors">
+							<td>{{DATA.itemDetails[item.id].name}}</td>
+							<td>{{item.quantity * -1 | number}} </td>
+							<td>{{item.quantity * Logic.System.runtimeInfo.minRuntime * -1 | number:0}}</td>
+							<td>{{item.quantity * p.runtime * -1 | number:0}}</td>
+							<!-- <td>{{(COST[DATA.itemDetails[item.id].tier] * item.quantity * p.taxRate / 100 * -1) | number}}</td> -->
+						</tr>
+						<tr></tr>
+						<tr ng-repeat="item in p.ioDetails" ng-if="item.quantity > 0" class="exportColors">
+							<td>{{DATA.itemDetails[item.id].name}}</td>
+							<td>{{item.quantity | number}}</td>
+							<td>{{item.quantity * Logic.System.runtimeInfo.minRuntime | number:0}}</td>
+							<td>{{item.quantity * p.runtime | number:0}}</td>
+							<!-- <td>{{(COST[DATA.itemDetails[item.id].tier] * item.quantity * p.taxRate / 100) | number}}</td> -->
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>

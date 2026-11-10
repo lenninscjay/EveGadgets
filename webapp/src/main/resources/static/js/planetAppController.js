@@ -1142,10 +1142,10 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 		if(json.eo){$scope.ex_orderType = json.eo;} else {$scope.ex_orderType = "buy";}
 		if(json.im){$scope.im_marketStatType = normalizeMarketStat(json.im);} else {$scope.im_marketStatType = "percentile";}
 		if(json.em || json.ex){$scope.ex_marketStatType = normalizeMarketStat(json.em || json.ex);} else {$scope.ex_marketStatType = "percentile";}
-		if(json.ib){$scope.im_brokerfees = json.ib;} else {$scope.im_brokerfees = 1;}
-		if(json.eb){$scope.ex_brokerfees = json.eb;} else {$scope.ex_brokerfees = 1;}
-		if(json.it){$scope.im_salestax = json.it;} else {$scope.im_salestax = 1.5;}
-		if(json.et){$scope.ex_salestax = json.et;} else {$scope.ex_salestax = 1.5;}
+		if(json.ib != null){$scope.im_brokerfees = json.ib;} else {$scope.im_brokerfees = 1;}
+		if(json.eb != null){$scope.ex_brokerfees = json.eb;} else {$scope.ex_brokerfees = 1;}
+		if(json.it != null){$scope.im_salestax = json.it;} else {$scope.im_salestax = 1.5;}
+		if(json.et != null){$scope.ex_salestax = json.et;} else {$scope.ex_salestax = 1.5;}
 		
 		var planets = [];
 		angular.forEach(json.pl, function(p){
@@ -1155,10 +1155,10 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 				if(f.s){
 					factory.schematic = $scope.data.itemDetails[f.s].name;
 				}
-				if(f.n){
+				if(f.n != null){
 					factory.number = f.n;
 				}
-				if(f.a){
+				if(f.a != null){
 					factory.avgActiveCycles = f.a;
 				}
 				planet.basics.push(factory);
@@ -1168,10 +1168,10 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 				if(f.s){
 					factory.schematic = $scope.data.itemDetails[f.s].name;
 				}
-				if(f.n){
+				if(f.n != null){
 					factory.number = f.n;
 				}
-				if(f.a){
+				if(f.a != null){
 					factory.avgActiveCycles = f.a;
 				}
 				planet.advanced.push(factory);
@@ -1181,10 +1181,10 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 				if(f.s){
 					factory.schematic = $scope.data.itemDetails[f.s].name;
 				}
-				if(f.n){
+				if(f.n != null){
 					factory.number = f.n;
 				}
-				if(f.a){
+				if(f.a != null){
 					factory.avgActiveCycles = f.a;
 				}
 				planet.hightech.push(factory);
@@ -1199,16 +1199,16 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 				}
 				planet.extractors.push(extractor);
 			});
-			if(p.s){planet.storagefacilities = p.s};
-			if(p.p){planet.launchpads = p.p};
-			if(p.c){planet.useCCStorage = p.c};
-			if(p.r){planet.restrictPads = p.r};
-			if(p.t){planet.taxRate = p.t};
-			if(p.l){planet.level = p.l};
-			if(p.n){planet.AvgLinkLength = p.n};
-			if(p.v){planet.avgActiveCycles = p.v};
-			if(p.f){planet.isFactoryPlanet = p.f};
-			if(p.x){planet.text = p.x};
+			if(p.s != null){planet.storagefacilities = p.s};
+			if(p.p != null){planet.launchpads = p.p};
+			if(p.c != null){planet.useCCStorage = p.c};
+			if(p.r != null){planet.restrictPads = p.r};
+			if(p.t != null){planet.taxRate = p.t};
+			if(p.l != null){planet.level = p.l};
+			if(p.n != null){planet.AvgLinkLength = p.n};
+			if(p.v != null){planet.avgActiveCycles = p.v};
+			if(p.f != null){planet.isFactoryPlanet = p.f};
+			if(p.x != null){planet.text = p.x};
 			planet.planetId = planets.length;
 			planets.push(planet);
 			console.log(planet);

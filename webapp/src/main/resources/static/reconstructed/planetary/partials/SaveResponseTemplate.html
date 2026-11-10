@@ -1,0 +1,16 @@
+<div class="container-fluid">
+	<div class="row" ng-show="saveKey">
+		<div class="col-md-12">
+			<h2>Successfully saved setup</h2>
+			<p>In convenient link form!  <a ng-href="{{baseUrl}}{{saveKey}}" target="_blank">{{baseUrl}}{{saveKey}}</a></p>
+		</div>
+	</div>
+
+
+	<div class="row" ng-hide="saveKey">
+		<div class="col-md-12">
+			<p>Something went wrong and your setup was not correctly saved. </p>
+			<p>Check that the database is running and try again.</p>
+		</div>
+	</div>
+</div>

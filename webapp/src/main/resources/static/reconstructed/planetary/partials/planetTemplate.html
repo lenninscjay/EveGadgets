@@ -1,0 +1,297 @@
+<div class="container-fluid">
+	<div class="row">
+		<div class="customHeader col-md-11">
+			<h2>
+				<form class="input-group col-xs-12">
+					<span ng-hide="p.editText" class="interactableColor">{{p.name}}</span>
+
+					<input type="text" class="form-control input-lg" ng-model="p.name" ng-show="p.editText">
+					<span class="input-group-btn" ng-show="p.editText">
+						<button type="submit" class="btn btn-primary btn-lg" ng-click="p.editText=0"
+							style="border-radius: 0px 6px 6px 0px">
+							<span class="glyphicon glyphicon-ok"></span>
+						</button>
+					</span>
+
+					<span class="btn-group pull-right">
+						<button type="button" class="btn btn-success btn-md" ng-click="p.editText=!p.editText">Edit Name</button>
+						<button type="button" ng-click="Logic.createPlanetFromCopy(p)" class="btn btn-success btn-md">
+							Create Duplicate
+						</button>
+						<button type="button" ng-click="deletePlanet(p)" class="btn btn-danger btn-md">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+				  	</span>
+				</form>
+		  	</h2>
+		</div>
+	</div>
+
+
+	<div class="row">
+		<!-- Info Panel -->
+		<div class="col-sm-12 col-md-6" style="padding-left:4px">
+
+			<div class="row">
+				<div class="col-xs-12">Possible Planet Types</div>
+				<div class="col-xs-3 planetTypes" ng-repeat="pt in p.allowedPlanets">
+					{{PLANETNAME[pt]}}
+				</div>
+			</div><br>
+
+			<div class="col-xs-6">
+				<div class="barContainer">
+					<div class="row">
+						Supply Hrs: <small>{{p.runtime}}</small>
+						<span style="float:right">
+							<small>{{p.runtime/24 | number:1}} days</small>
+						</span>
+						</div>
+						<div class="progress row">
+						  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="24"
+							aria-valuemin="0" aria-valuemax="{{p.runtime}}"
+							ng-style="{'width' : 24/p.runtime * 100 + '%'}">
+						  </div>
+						</div>
+					<div class="row">Cost: {{p.Cost | number:0}} ISK</div>
+				</div>
+			</div>
+
+			<div class="col-xs-6" style="padding-right:4px">
+				<div class="barContainer">
+					<div class="row">
+						<span ng-class="p.CPU>LEVEL[p.level].CPU ? 'text-danger' : ''">CPU: {{100 * p.CPU / LEVEL[p.level].CPU|number:0}}%</span>
+						<span class="pull-right">
+							<small>{{p.CPU|number:1}} / {{LEVEL[p.level].CPU|number:0}}tf</small>
+						</span>
+					</div>
+					<div class="progress row">
+					  <div ng-class="p.CPU>LEVEL[p.level].CPU ? 'progress-bar-danger' : 'progress-bar-info'" class="progress-bar" role="progressbar" aria-valuenow="{{p.CPU}}"
+						aria-valuemin="0" aria-valuemax="{{LEVEL[p.level].CPU}}"
+						ng-style="{width : p.CPU/LEVEL[p.level].CPU * 100 + '%' }">
+					  </div>
+					</div>
+					<div class="row">
+						<span ng-class="p.Grid>LEVEL[p.level].GRID ? 'text-danger' : ''">PG: {{100 * p.Grid / LEVEL[p.level].GRID|number:0}}%</span>
+						<span class="pull-right">
+							<small>{{p.Grid|number:1}} / {{LEVEL[p.level].GRID|number:0}}gw</small>
+						</span>
+					</div>
+					<div class="progress row">
+						  <div ng-class="p.Grid>LEVEL[p.level].GRID ? 'progress-bar-danger' : 'progress-bar-warning'" class="progress-bar" role="progressbar" aria-valuenow="{{p.Grid}}"
+							aria-valuemin="0" aria-valuemax="{{LEVEL[p.level].GRID}}"
+							ng-style="{width : p.Grid/LEVEL[p.level].GRID * 100 + '%'}">
+						  </div>
+					</div>
+				</div>
+			</div>
+
+			<h5>Command Center Level</h5>
+			<div class="btn-group btn-group-justified interactableColor" role="group" aria-label="cclevel" ng-click="p.refreshFitting()">
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=0" ng-class="{'btn-primary' : p.level >= 0}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=1" ng-class="{'btn-primary' : p.level >= 1}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=2" ng-class="{'btn-primary' : p.level >= 2}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=3" ng-class="{'btn-primary' : p.level >= 3}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=4" ng-class="{'btn-primary' : p.level >= 4}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=5" ng-class="{'btn-primary' : p.level >= 5}"></button>
+				</div>
+			</div>
+			<!-- Use border-color, it's noticeable. Also border-radius:0 -->
+
+			<table class="table table-condensed" style="border-top:0px">
+				<tr>
+					<th>Item</th>
+					<th>Hourly</th>
+					<th>Per Run</th>
+					<th>Taxes/Hour</th>
+				</tr>
+				<tr ng-repeat="item in p.ioDetails" ng-if="item.quantity < 0" class="importColors">
+				<!-- DATA.itemDetails[2876 -->
+					<td>{{DATA.itemDetails[item.id].name}}</td>
+					<td>{{item.quantity * -1 | number}} </td>
+					<td>{{item.quantity * p.runtime * -1 | number:0}}
+					<td>{{(COST[DATA.itemDetails[item.id].tier] * item.quantity * p.taxRate / 100 * -1)/2 | number}}</td>
+					<!-- <td>{{costByTier[data.itemDetails[item.typeID].tier]}} {{item.quantity}}  {{p.taxRate / 100 * -1}}</td> -->
+				</tr>
+				<tr></tr>
+				<tr ng-repeat="item in p.ioDetails" ng-if="item.quantity > 0" class="exportColors">
+					<td>{{DATA.itemDetails[item.id].name}}</td>
+					<td>{{item.quantity | number}}</td>
+					<td>{{item.quantity * p.runtime | number:0}}</td>
+					<td>{{(COST[DATA.itemDetails[item.id].tier] * item.quantity * p.taxRate / 100) | number}}</td>
+				</tr>
+			</table>
+		</div>
+
+		<!-- Interaction Panel -->
+		<div class="col-sm-12 col-md-6">
+
+			<div class="row">
+				<h4 >Add Basic Factory
+				<button class="btn btn-primary btn-sm" ng-click="p.addBasic()">
+					Basic
+				</button>
+				</h4>
+				<div ng-repeat="f in p.factoriesBasic">
+					<eg-factory-manager factory="f" factory-list="p.factoriesBasic" p="p" type-list="Logic.basicTypeList"
+						delete-this-factory="p.deleteBasic(f)">
+					</eg-factory-manager>
+				</div>
+			</div>
+
+			<div class="row">
+				<h4 >Add Advanced Factory
+				<button class="btn btn-primary btn-sm" ng-click="p.addAdvanced()">
+					Advanced
+				</button>
+				</h4>
+				<div ng-repeat="f in p.factoriesAdvanced">
+					<eg-factory-manager factory="f" factory-list="p.factoriesAdvanced" p="p" type-list="Logic.advancedTypeList"
+						delete-this-factory="p.deleteAdvanced(f)">
+					</eg-factory-manager>
+				</div>
+			</div>
+
+			<div class="row">
+				<h4 >Add High Tech Factory
+				<button class="btn btn-primary btn-sm" ng-click="p.addHightech()">
+					High Tech
+				</button>
+				</h4>
+				<div ng-repeat="f in p.factoriesHightech">
+					<eg-factory-manager factory="f" factory-list="p.factoriesHightech" p="p" type-list="Logic.hightechTypeList"
+						delete-this-factory="p.deleteHightech(f)">
+					</eg-factory-manager>
+				</div>
+			</div>
+
+			<div class="row">
+				<h4 >
+				Add Extractor
+				<button class="btn btn-primary btn-sm" ng-click="p.addExtractor()">
+					Extractor
+				</button>
+				</h4>
+				<div class="input-group input-group-sm" ng-repeat="e in p.extractors">
+					<span class="input-group-btn">
+						<button class="btn btn-danger" style="float:left;"
+						 ng-click="p.deleteExtractor(e)">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+					</span>
+
+					<select class="input form-control" style="width:auto"
+						ng-model="e.resourceId"
+						ng-options="type.id as type.name for type in p.resourceDatalist | orderBy:'name'"
+
+						ng-change="p.refreshImportExports(); p.refreshAllowedPlanets()"></select>
+
+					<span class="input-group input-group-sm">
+						<span class="input-group-btn">
+						  <button type="button" class="btn btn-default btn-number" ng-show="e.headcount"
+						  ng-click="e.headcount = e.headcount-1; p.refreshFitting()">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+						  <button type="button" class="btn btn-disabled btn-number" ng-hide="e.headcount">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+					  </span>
+					  <input type="number" ng-model="e.headcount" class="form-control input-number pull-left" style="width:60px"
+						ng-blur="p.refreshFitting()" ng-hide="e.headcount == 0">
+					  <input class="form-control input-number pull-left" style="width:60px" placeholder="Heads" ng-show="e.headcount == 0"
+						ng-click="e.headcount = 1">
+					  <span class="input-group-btn pull-left" style="float:left">
+						  <button type="button" class="btn btn-default" ng-click="e.headcount = e.headcount+1; p.refreshFitting()"
+							 ng-show="e.headcount < 10">
+							  <span class="glyphicon glyphicon-plus"/>
+						  </button>
+						  <button type="button" class="btn btn-default btn-disabled"
+							 ng-hide="e.headcount < 10">
+							  <span class="glyphicon glyphicon-plus"/>
+						  </button>
+					  </span>
+					</span>
+				</div>
+			</div>
+
+
+			<h5 class="row">
+				<span>
+				Storage:
+				<button class="btn btn-xs"
+					ng-class="p.numStorage > 0 ? 'btn-primary' : 'btn-disabled'"
+					ng-click="p.numStorage = p.numStorage - 1; p.refreshStorage()" >
+					<span class="glyphicon glyphicon-minus"/>
+				</button>
+				<span class="facilitiesDisplay">{{p.numStorage}}</span>
+				<button ng-click="p.numStorage = p.numStorage + 1; p.refreshStorage()"
+					class="btn btn-primary btn-xs">
+					<span class="glyphicon glyphicon-plus"/>
+				</button>
+				</span>
+
+				<span style="margin-left:10px">
+				Launchpads:
+				<button ng-click="p.numLaunchpads = p.numLaunchpads - 1; p.refreshStorage()" class="btn btn-xs"
+					ng-class="p.numLaunchpads > 0 ? 'btn-primary' : 'btn-disabled'">
+					<span class="glyphicon glyphicon-minus"/>
+				</button>
+				<span class="facilitiesDisplay">{{p.numLaunchpads}}</span>
+				<button ng-click="p.numLaunchpads = p.numLaunchpads + 1; p.refreshStorage()"
+					class="btn btn-primary btn-xs">
+					<span class="glyphicon glyphicon-plus"/>
+				</button>
+				</span>
+			</h5>
+
+			<h5 class="row">Tax Rate %: <input type="number" class="form-control input-sm" ng-model="p.taxRate"
+				style="width:40px; display:inline; line-height:1; height:22px" min="0" max="100" maxlength=3 ng-change="p.refreshTaxes()">
+			</h5>
+
+			<h5 class="row">
+				Avg Link Length: <input type="number" class="form-control input-sm" ng-model="p.avgLinkLength" ng-blur="p.refreshFitting()"
+					style="width:80px; display:inline; line-height:1">
+				<a tooltip="This must be estimated. This can be 10K+ for Gas planets, so don't ignore it">
+					<span class="glyphicon glyphicon-question-sign"></span>
+				</a>
+			</h5>
+
+			<h5 class="row">
+				<input type="checkbox" ng-model="p.useCCStorage" ng-change="p.refreshStorage()">
+					Use Command Center for Storage
+			</h5>
+			<h5 class="row">
+				<input type="checkbox" ng-model="p.restrictPads" ng-change="p.refreshStorage()">
+					Imports/Exports only use Launchpads
+			</h5>
+			<h5 class="row">
+				<input type="checkbox" ng-model="p.isFactoryPlanet" ng-click="p.cyclesPerActiveCycle=1">
+					Partial Utilization
+
+				<span ng-if="p.isFactoryPlanet">
+					: Planet is active every
+					<input type="number" ng-model="p.cyclesPerActiveCycle" class="form-inline input-sm utilizationField"
+					ng-change="p.refreshImportExports()"
+					style="margin-left: initial">
+						cycles
+				</span>
+				<a tooltip="{{utilizationMessage}}">
+					<span class="glyphicon glyphicon-question-sign"></span>
+				</a>
+			</h5>
+		</div>
+	</div>
+
+</div>
+

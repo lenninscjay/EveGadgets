@@ -97,3 +97,12 @@ The API page does not state a numeric aggregate-request quota. Our 30-minute lif
 - The legacy Scrap path can include non-PI types, producing a separate batch/cache key; the above one-batch behavior is for the supported PI planner.
 
 Tests use an injected clock and fake provider to verify all-83 batching, cache reuse, expiration, separate locations, simultaneous callers, and provider cooldown without making network requests.
+
+### Reconstructed eve-pi.com interface
+
+An opt-in reconstruction of **Omarus Nagibatus's** archived interface is available at
+http://localhost:8080/reconstructed/index.html#/ after the same Docker startup.
+It preserves the current PI dataset, corrected cargo volumes, Fuzzwork integration,
+persistent market cache, and saved-setup database. The classic planner remains available.
+See [reconstruction notes](docs/eve-pi-reconstruction.md) for provenance, differences,
+validation limits and local checks. Historic eve-pi.com save IDs cannot be recovered.

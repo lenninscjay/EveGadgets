@@ -1,0 +1,11 @@
+<div class="well well-sm">
+<label>Product <select class="form-control" ng-model="factory.schematic"
+ ng-options="type.id as type.name for type in typeList | orderBy:'name'"
+ ng-change="p.refreshImportExports()"><option value="">Choose product</option></select></label>
+<label>Factories <input class="form-control" type="number" min="0" step="1" ng-model="factory.number"
+ ng-change="p.refreshFitting(); p.refreshImportExports()"></label>
+<label>Active every N cycles <input class="form-control" type="number" min="1" step="any"
+ ng-model="factory.avgActiveCycles" ng-change="p.refreshImportExports()"></label>
+<button class="btn btn-default" ng-click="p.addPrerequisiteProduction(factory)">Add prerequisites</button>
+<button class="btn btn-danger" ng-click="removeThis()">Remove factory</button>
+</div>

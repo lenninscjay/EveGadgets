@@ -1,0 +1,121 @@
+[
+  {
+    "path": "js/conf.js",
+    "bytes": 1670,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/js/conf.js"
+  },
+  {
+    "path": "js/marketIDs.js",
+    "bytes": 1674,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/js/marketIDs.js"
+  },
+  {
+    "path": "js/MarketService.js",
+    "bytes": 1003,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/js/MarketService.js"
+  },
+  {
+    "path": "planetary/controller/PlanetController.js",
+    "bytes": 2276,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/planetary/controller/PlanetController.js"
+  },
+  {
+    "path": "planetary/services/Logic.js",
+    "bytes": 13907,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/planetary/services/Logic.js"
+  },
+  {
+    "path": "planetary/services/Persist.js",
+    "bytes": 5597,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/planetary/services/Persist.js"
+  },
+  {
+    "path": "planetary/services/Planet.js",
+    "bytes": 18045,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/planetary/services/Planet.js"
+  },
+  {
+    "path": "planetary/services/PlanetData.js",
+    "bytes": 2408,
+    "source": "https://web.archive.org/web/20180907091411id_/http://eve-pi.com/planetary/services/PlanetData.js"
+  },
+  {
+    "path": "planetary/directives/factoryDirective.js",
+    "bytes": 696,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/planetary/directives/factoryDirective.js"
+  },
+  {
+    "path": "planetary/directives/HelpDirective.js",
+    "bytes": 180,
+    "source": "https://web.archive.org/web/20180907091409id_/http://eve-pi.com/planetary/directives/HelpDirective.js"
+  },
+  {
+    "path": "planetary/directives/InfopanelDirective.js",
+    "bytes": 183,
+    "source": "https://web.archive.org/web/20180907091408id_/http://eve-pi.com/planetary/directives/InfopanelDirective.js"
+  },
+  {
+    "path": "planetary/directives/MarketpanelDirective.js",
+    "bytes": 187,
+    "source": "https://web.archive.org/web/20180907091413id_/http://eve-pi.com/planetary/directives/MarketpanelDirective.js"
+  },
+  {
+    "path": "planetary/directives/planetDirective.js",
+    "bytes": 182,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/planetary/directives/planetDirective.js"
+  },
+  {
+    "path": "planetary/directives/SaveDirective.js",
+    "bytes": 186,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/planetary/directives/SaveDirective.js"
+  },
+  {
+    "path": "planetary/partials/HelpTemplate.html",
+    "bytes": 517,
+    "source": "https://web.archive.org/web/20190511204106id_/http://eve-pi.com/planetary/partials/HelpTemplate.html"
+  },
+  {
+    "path": "planetary/partials/InfopanelTemplate.html",
+    "bytes": 8124,
+    "source": "https://web.archive.org/web/20190511204105id_/http://eve-pi.com/planetary/partials/InfopanelTemplate.html"
+  },
+  {
+    "path": "planetary/partials/MarketpanelTemplate.html",
+    "bytes": 10507,
+    "source": "https://web.archive.org/web/20190511204106id_/http://eve-pi.com/planetary/partials/MarketpanelTemplate.html"
+  },
+  {
+    "path": "planetary/partials/planetTemplate.html",
+    "bytes": 11759,
+    "source": "https://web.archive.org/web/20190511204108id_/http://eve-pi.com/planetary/partials/planetTemplate.html"
+  },
+  {
+    "path": "planetary/partials/SaveResponseTemplate.html",
+    "bytes": 508,
+    "source": "https://web.archive.org/web/20190511204107id_/http://eve-pi.com/planetary/partials/SaveResponseTemplate.html"
+  },
+  {
+    "path": "planetary/piGadgetIndex.html",
+    "bytes": 3282,
+    "source": "https://web.archive.org/web/20190511204104id_/http://eve-pi.com/planetary/piGadgetIndex.html"
+  },
+  {
+    "path": "planetary/planetDetails",
+    "bytes": 15341,
+    "source": "https://web.archive.org/web/20190511204104id_/http://eve-pi.com/planetary/planetDetails"
+  },
+  {
+    "path": "index.html",
+    "bytes": 4283,
+    "source": "https://web.archive.org/web/20200606230344id_/http://eve-pi.com/"
+  },
+  {
+    "path": "css/app.css",
+    "bytes": 2123,
+    "source": "https://web.archive.org/web/20180907091414id_/http://eve-pi.com/css/app.css"
+  },
+  {
+    "path": "planetary/partials/factoryTemplate.html",
+    "error": "Replay redirected to a 2023 ww1.eve-pi.com parked page; discarded, not recovered."
+  }
+]
