@@ -9,7 +9,7 @@ public class NameMapCaller {
 
 	public static List<NameMapDomain> getNameMap() {
 		List<NameMapDomain> result 
-			= SessionHolder.useSession().selectList("NameMap.getPlanetResourceNameMap");
+			= SessionHolder.selectList("NameMap.getPlanetResourceNameMap");
 		return result;
 	}
 

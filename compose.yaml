@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: evegadgets
+      MYSQL_USER: evegadgets
+      MYSQL_PASSWORD: local-development-only
+      MYSQL_ROOT_PASSWORD: local-root-only
+    volumes:
+      - eve-data:/var/lib/mysql
+      - ./sql/local-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE -e 'SELECT COUNT(*) FROM invTypes' >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  app:
+    build: .
+    volumes:
+      - market-cache:/app/data
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://db:3306/evegadgets?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      DB_USER: evegadgets
+      DB_PASSWORD: local-development-only
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  eve-data:
+  market-cache:

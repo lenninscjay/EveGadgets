@@ -6,12 +6,7 @@ import org.servicelayer.models.PersistPlanetDomain;
 import org.springframework.ui.ModelMap;
 
 public class SavePlanetService {
-	private static SqlSession session = null;
-	
-	static{
-		session = MyBatisConnectionFactory.getSqlSessionFactory().openSession();
-	}
-	
+
 	public enum ResponseCodes{
 		//no, I don't know why I'm doing this. Doesn't matter had success 
 		SUCCESS(0, "Success"),
@@ -81,25 +76,26 @@ public class SavePlanetService {
 		return response;
 	}
 	
-	private static int savePlanet(PersistPlanetDomain planetSetup){
-		int response = session.insert("PlanetPersistence.savePlanet", planetSetup);
-		session.commit();
-		return response;
-	}
-	
-	private static PersistPlanetDomain getSetupFromKey(int hashKey){
-		return session.selectOne("PlanetPersistence.getPlanet", hashKey);
-	}
-	
-	private static int refreshCreatedDate(int hashKey){
-		int response = session.update("PlanetPersistence.refreshCreatedDate", hashKey);
-		session.commit();
-		return response;
-	}
-	
-	/*public static List<SchematicDomain> getSchematicsList(){
-		return session.selectList("Schematics.getSchematics");
-	}*/
-	
-	
+    private static int savePlanet(PersistPlanetDomain planetSetup) {
+        SqlSession session = MyBatisConnectionFactory.getSqlSessionFactory().openSession();
+        try {
+            int result = session.insert("PlanetPersistence.savePlanet", planetSetup);
+            session.commit();
+            return result;
+        } finally { session.close(); }
+    }
+    private static PersistPlanetDomain getSetupFromKey(int hashKey) {
+        SqlSession session = MyBatisConnectionFactory.getSqlSessionFactory().openSession();
+        try {
+            return session.selectOne("PlanetPersistence.getPlanet", hashKey);
+        } finally { session.close(); }
+    }
+    private static int refreshCreatedDate(int hashKey) {
+        SqlSession session = MyBatisConnectionFactory.getSqlSessionFactory().openSession();
+        try {
+            int result = session.update("PlanetPersistence.refreshCreatedDate", hashKey);
+            session.commit();
+            return result;
+        } finally { session.close(); }
+    }
 }

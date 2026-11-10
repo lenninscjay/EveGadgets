@@ -30,7 +30,7 @@
 			T.typeName,
 			M.materialTypeID,
 			M.quantity
-		FROM invtypes T
+		FROM invTypes T
 			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
 			INNER JOIN invGroups G on G.groupID=T.groupID
 			INNER JOIN invTypes MT on MT.typeID=M.materialTypeID
@@ -44,7 +44,7 @@
 			T.typeName,
 			M.materialTypeID,
 			M.quantity
-		FROM invtypes T
+		FROM invTypes T
 			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
 			INNER JOIN invGroups G on G.groupID=T.groupID
 		AND G.allowRecycler=1;
@@ -56,7 +56,7 @@
 			T.typeName,
 			M.materialTypeID,
 			M.quantity
-		FROM invtypes T
+		FROM invTypes T
 			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
 			INNER JOIN invGroups G on G.groupID=T.groupID
 		AND G.allowRecycler=1
@@ -69,7 +69,7 @@
 			T.typeName,
 			M.materialTypeID,
 			M.quantity
-		FROM invtypes T
+		FROM invTypes T
 			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
 			INNER JOIN invGroups G on G.groupID=T.groupID
 		AND G.allowRecycler=1
@@ -83,7 +83,7 @@
 			M.materialTypeID,
 			M.quantity,
 			MT.typeName as materialName
-		FROM invtypes T
+		FROM invTypes T
 			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
 			INNER JOIN invGroups G on G.groupID=T.groupID
 			INNER JOIN invTypes MT on MT.typeID=M.materialTypeID
@@ -98,7 +98,7 @@
 			M.materialTypeID,
 			M.quantity,
 			MT.typeName as materialName
-		FROM invtypes T
+		FROM invTypes T
 			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
 			INNER JOIN invGroups G on G.groupID=T.groupID
 			INNER JOIN invTypes MT on MT.typeID=M.materialTypeID
@@ -113,7 +113,7 @@
 			M.materialTypeID,
 			M.quantity,
 			MT.typeName as materialName
-		FROM invtypes T
+		FROM invTypes T
 			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
 			INNER JOIN invGroups G on G.groupID=T.groupID
 			INNER JOIN invTypes MT on MT.typeID=M.materialTypeID

@@ -9,6 +9,6 @@ public class PlanetSchematicsCaller {
 
 	
 	public static List<SchematicDomain> getSchematicsList(){
-		return SessionHolder.useSession().selectList("Schematics.getSchematics");
+		return SessionHolder.selectList("Schematics.getSchematics");
 	}
 }

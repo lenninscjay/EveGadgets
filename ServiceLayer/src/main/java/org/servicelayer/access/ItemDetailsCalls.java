@@ -10,13 +10,13 @@ public class ItemDetailsCalls {
 	
 	public static List<ItemDetailsDomain> getItemDetailsList() {
 		List<ItemDetailsDomain> result 
-			= SessionHolder.useSession().selectList("ItemDetails.getPlanetResourceTypeNameTier");
+			= SessionHolder.selectList("ItemDetails.getPlanetResourceTypeNameTier");
 		return result;
 	}
 	
 	public static List<ImportantItemDetailsDomain> getImportantItemDetails(List<Integer> itemIdList){
 		List<ImportantItemDetailsDomain> result
-			= SessionHolder.useSession().selectList("ItemDetails.getImportantItemDetails", itemIdList);
+			= SessionHolder.selectList("ItemDetails.getImportantItemDetails", itemIdList);
 		return result;
 	}
 

@@ -1,73 +1,47 @@
 package org.priceutils.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.priceutils.calls.EveCentralHandler;
+import java.io.IOException;
+import java.util.Arrays;
+import org.priceutils.calls.FuzzworkHandler;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/priceAPI")
 public class PriceAPIController {
-	
-	/*@RequestMapping("/mock")
-	public Map<Integer, PriceMap> getMockPriceMap(
-			@RequestParam(value="typeList") String[] types){
-		System.out.println("DEBUG: in getPriceMap with arg: <" + types + ">");
-		List<Integer> typeList = new ArrayList<Integer>();
-		for(String type : types){
-			try{
-				typeList.add(Integer.parseInt(type));
-			} catch(Exception e){
-				System.out.println("ERROR: PriceAPIController bad type: <" + type + ">, "
-						+ "Message = " + e.getMessage());
-			}
-		}
-		return MockPriceUtil.getPriceMap(typeList, 0);
-	}*/
-	
-	@RequestMapping("/test")
-	public String testEndpoint(){
-		return "priceAPI endpoint works";
-	}
+    @RequestMapping(value="/test", method=RequestMethod.GET)
+    public String testEndpoint() { return "priceAPI endpoint works"; }
 
-	@RequestMapping("")
-	public ModelMap getPriceMap(
-			@RequestParam(value="type") String[] types,
-			@RequestParam(value="system") String[] systems){
-		List<Integer> typeList = new ArrayList<Integer>();
-		List<Integer> systemList = new ArrayList<Integer>();
-		
-		if(types.length == 0){
-			return null;
-		}
-		if(systems.length == 0){
-			systemList.add(30000142); //default system is Jita
-		}
-		for(String type : types){
-			try{
-				typeList.add(Integer.parseInt(type));
-			}catch(Exception e){
-				System.out.println("Failed to parse type: " + type);
-				}
-		}
-		for(String system: systems){
-			try{
-				systemList.add(Integer.parseInt(system));
-			}catch(Exception e){
-				System.out.println("Failed to parse system: " + system);
-				}
-		}
-		try {
-			return EveCentralHandler.getMarketStatDisplays(typeList, systemList);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
+    @RequestMapping(value="/warm", method=RequestMethod.GET)
+    public ResponseEntity<ModelMap> warm(@RequestParam(value="system", defaultValue="10000002") int market) {
+        if (market <= 0) return error("Invalid location", HttpStatus.BAD_REQUEST);
+        try {
+            FuzzworkHandler.warm(market);
+            return new ResponseEntity<ModelMap>(new ModelMap("cache", "ready"), HttpStatus.OK);
+        } catch (IOException ex) { return error("Market prices unavailable; retry later", HttpStatus.BAD_GATEWAY); }
+    }
 
+    @RequestMapping(value="", method=RequestMethod.GET)
+    public ResponseEntity<ModelMap> getPriceMap(
+            @RequestParam(value="type") Integer[] types,
+            @RequestParam(value="system", defaultValue="30000142") Integer[] systems) {
+        if (types.length == 0 || types.length > 100 || systems.length == 0 || systems.length > 2) {
+            return error("Request must contain 1-100 types and 1-2 locations", HttpStatus.BAD_REQUEST);
+        }
+        for (Integer type : types) if (type == null || type <= 0) return error("Invalid type", HttpStatus.BAD_REQUEST);
+        for (Integer system : systems) if (system == null || system <= 0) return error("Invalid location", HttpStatus.BAD_REQUEST);
+        try {
+            return new ResponseEntity<ModelMap>(FuzzworkHandler.getMarketStatDisplays(Arrays.asList(types), Arrays.asList(systems)), HttpStatus.OK);
+        } catch (IOException ex) {
+            return error("Market prices unavailable; retry later", HttpStatus.BAD_GATEWAY);
+        }
+    }
+    private ResponseEntity<ModelMap> error(String message, HttpStatus status) {
+        return new ResponseEntity<ModelMap>(new ModelMap("error", message), status);
+    }
 }
