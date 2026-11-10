@@ -96,6 +96,7 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 //		console.log($scope.data.schematicMap)
 //		console.log($scope.data);
 		populateDatalists();
+        $http.get("/priceAPI/warm", {params:{system:$scope.importMarketSystem}});
 		if($routeParams.planetKey){
 			console.log("params.planetKey identified: " + $routeParams.planetKey);
 			planetApi.getSetup($routeParams.planetKey)

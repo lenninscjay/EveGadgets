@@ -17,6 +17,15 @@ public class PriceAPIController {
     @RequestMapping(value="/test", method=RequestMethod.GET)
     public String testEndpoint() { return "priceAPI endpoint works"; }
 
+    @RequestMapping(value="/warm", method=RequestMethod.GET)
+    public ResponseEntity<ModelMap> warm(@RequestParam(value="system", defaultValue="10000002") int market) {
+        if (market <= 0) return error("Invalid location", HttpStatus.BAD_REQUEST);
+        try {
+            FuzzworkHandler.warm(market);
+            return new ResponseEntity<ModelMap>(new ModelMap("cache", "ready"), HttpStatus.OK);
+        } catch (IOException ex) { return error("Market prices unavailable; retry later", HttpStatus.BAD_GATEWAY); }
+    }
+
     @RequestMapping(value="", method=RequestMethod.GET)
     public ResponseEntity<ModelMap> getPriceMap(
             @RequestParam(value="type") Integer[] types,

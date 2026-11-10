@@ -31,21 +31,36 @@ public final class FuzzworkHandler {
     public static ModelMap getMarketStatDisplays(List<Integer> types, List<Integer> markets) throws IOException {
         ModelMap result = new ModelMap();
         for (Integer market : new LinkedHashSet<Integer>(markets)) {
+            merge(result, CACHE.get(types, market), types, market);
+        }
+        return result;
+    }
+
+    private static final MarketCache CACHE = new MarketCache(new MarketCache.Loader() {
+        public JsonNode load(List<Integer> types, int market) throws IOException {
             HttpURLConnection connection = (HttpURLConnection) new URL(requestUrl(types, market)).openConnection();
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(10000);
-            connection.setRequestProperty("User-Agent", "EveGadgets-localhost/1.0");
+            connection.setRequestProperty("User-Agent", "EveGadgets/1.0 (+https://github.com/lenninscjay/EveGadgets)");
             connection.setRequestProperty("Accept", "application/json");
             try {
-                if (connection.getResponseCode() != 200) throw new IOException("Market provider HTTP " + connection.getResponseCode());
-                try (InputStream input = connection.getInputStream()) {
-                    merge(result, MAPPER.readTree(input), types, market);
+                if (connection.getResponseCode() != 200) {
+                    throw new MarketCache.ProviderException(connection.getHeaderField("Retry-After"));
                 }
-            } finally {
-                connection.disconnect();
-            }
+                try (InputStream input = connection.getInputStream()) {
+                    JsonNode data = MAPPER.readTree(input);
+                    if (data == null || !data.isObject()) throw new IOException("Invalid market response");
+                    return data;
+                }
+            } finally { connection.disconnect(); }
         }
-        return result;
+    }, new java.util.function.LongSupplier() {
+        public long getAsLong() { return System.currentTimeMillis(); }
+    }, java.nio.file.Paths.get(System.getenv("MARKET_CACHE_FILE") == null
+        ? "data/market-cache.json" : System.getenv("MARKET_CACHE_FILE")));
+
+    public static void warm(int market) throws IOException {
+        CACHE.get(java.util.Collections.<Integer>emptyList(), market);
     }
 
     public static void merge(ModelMap result, JsonNode data, List<Integer> types, int market) throws IOException {

@@ -80,3 +80,20 @@ Maven tests cover Fuzzwork parsing (including market volumes beyond 32-bit integ
 Original author: Kurt Midas. Original project: https://github.com/Kurt-Midas/EveGadgets
 
 The original MIT license remains in `LICENSE`.
+
+## Market API courtesy policy
+
+Fuzzwork recommends fetching aggregates in bulk and reusing them locally:
+https://market.fuzzwork.co.uk/api/
+
+The API page does not state a numeric aggregate-request quota. Our 30-minute lifetime is an application policy, not a claimed provider limit.
+
+- On PI session initialization, warm the default selected market with all 83 PI type IDs in one request. A newly selected market loads on first price use.
+- Cache raw aggregate responses in the Java server for 30 minutes, shared across browser tabs and sessions. Requested PI subsets all use the same cache entry; missing/empty item data does not cause repeated upstream requests.
+- Refresh on the first use after expiration, not with an idle background timer. The refresh button cannot bypass the cache. Each distinct region/system is a separate provider request.
+- Serialize cache misses to prevent simultaneous requests from duplicating a fetch. Retain at most 64 entries.
+- On network/provider failures, apply a process-wide five-minute cooldown. Honor longer `Retry-After` values (seconds or HTTP date). No automatic retry loops, and expired prices are not silently served as current.
+- The cache, absolute expiry timestamps and provider cooldown are persisted atomically to `data/market-cache.json` (override with `MARKET_CACHE_FILE`). Docker stores this in the `market-cache` named volume, surviving container restarts and rebuilds. A restart does not reset the interval. Removing volumes with `down -v` deletes the cache. Separate app instances must use separate cache files; this is a single-server design. If cache storage is corrupt/unwritable, requests fail rather than repeatedly bypassing persistence. Static PI recipes and volumes never require market API lookups.
+- The legacy Scrap path can include non-PI types, producing a separate batch/cache key; the above one-batch behavior is for the supported PI planner.
+
+Tests use an injected clock and fake provider to verify all-83 batching, cache reuse, expiration, separate locations, simultaneous callers, and provider cooldown without making network requests.

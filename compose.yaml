@@ -16,6 +16,8 @@ services:
       retries: 30
   app:
     build: .
+    volumes:
+      - market-cache:/app/data
     ports:
       - "127.0.0.1:8080:8080"
     environment:
@@ -27,3 +29,4 @@ services:
         condition: service_healthy
 volumes:
   eve-data:
+  market-cache:

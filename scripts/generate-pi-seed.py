@@ -45,6 +45,7 @@ def generate(types, schematics, mapping):
         text=(ROOT/'sql'/source).read_text()
         text='\n'.join(l for l in text.splitlines() if not l.startswith('DROP TABLE') and not l.startswith('LOCK TABLES') and not l.startswith('UNLOCK TABLES'))
         (out/dest).write_text(text+'\n')
+    (ROOT/'priceutils/src/main/resources/pi-type-ids.txt').write_text(','.join(sorted(ids,key=int))+'\n')
     print('Seed generated: %d items, %d schematics, %d recipe rows' % (len(types),len(schematics),len(mapping)))
 
 if __name__ == '__main__':
