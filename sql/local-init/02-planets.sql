@@ -6,7 +6,7 @@
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `planetaryResourceTypeMap` (
   `planetId` int(11) NOT NULL,
-  `resourceId` int(11) DEFAULT NULL,
+  `resourceId` int(11) NOT NULL,
   PRIMARY KEY (`planetId`,`resourceId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*
