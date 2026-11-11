@@ -1,5 +1,5 @@
 // The compact schema is shared with the classic planner and its MySQL saves.
-angular.module('persistservice', ['PlanetModel']).service('persistHandler', ['$http', '$q', 'Planet', function($http, $q, Planet){
+angular.module('persistservice', ['PlanetModel']).service('persistHandler', ['$http', '$q', 'Planet', 'PiDataModel', function($http, $q, Planet, PiDataModel){
     function value(v, fallback){return v === null || v === undefined ? fallback : v;}
     function statistic(s){
         if (s === 'avg') return 'wavg';
@@ -21,8 +21,49 @@ angular.module('persistservice', ['PlanetModel']).service('persistHandler', ['$h
                 return out;
             })};
     }
+    function number(v, min, max, label, integer){
+        if (typeof v !== 'number' || !isFinite(v) || v < min || v > max || (integer && Math.floor(v) !== v))
+            throw new Error('Invalid ' + label + '.');
+    }
+    function validate(data){
+        if (!data || typeof data !== 'object' || !Array.isArray(data.pl) || !data.pl.length || data.pl.length > 1000)
+            throw new Error('Setup must contain between 1 and 1,000 planets.');
+        var details = PiDataModel.getData().itemDetails;
+        var recipes = PiDataModel.getData().schematicMap;
+        ['is','es'].forEach(function(k){if(data[k]) number(+data[k],1,2147483647,'market location',true);});
+        ['ib','eb','it','et'].forEach(function(k){if(data[k] != null) number(data[k],0,100,'tax or broker fee');});
+        ['io','eo'].forEach(function(k){if(data[k] != null && ['buy','sell'].indexOf(data[k]) < 0) throw new Error('Invalid order side.');});
+        data.pl.forEach(function(p){
+            if (!p || typeof p !== 'object' || Array.isArray(p)) throw new Error('Invalid planet.');
+            if (p.x != null && typeof p.x !== 'string') throw new Error('Planet name must be text.');
+            ['c','r','f'].forEach(function(k){if(p[k] != null && typeof p[k] !== 'boolean') throw new Error('Invalid planet option.');});
+            ['s','p','n'].forEach(function(k){if(p[k] != null) number(p[k],0,1000000,'facility count or link length',true);});
+            if(p.t != null) number(p.t,0,100,'planet tax');
+            if(p.l != null) number(p.l,0,5,'command center level',true);
+            if(p.v != null) number(p.v,1,1000000,'planet cycle interval');
+            ['b','a','h','e'].forEach(function(k){
+                if(p[k] == null) return;
+                if(!Array.isArray(p[k]) || p[k].length > 10000) throw new Error('Invalid facility list.');
+                p[k].forEach(function(f){
+                    if(!f || typeof f !== 'object') throw new Error('Invalid facility.');
+                    var id = k === 'e' ? f.r : f.s;
+                    if(id){
+                        var item = Object.prototype.hasOwnProperty.call(details,id) && details[id];
+                        var allowed = {e:[0],b:[1],a:[2,3],h:[4]}[k];
+                        if(!item || allowed.indexOf(item.tier) < 0 || (k !== 'e' && !Object.prototype.hasOwnProperty.call(recipes,id)))
+                            throw new Error('Unknown commodity or wrong factory tier: ' + id);
+                    }
+                    if(k === 'e'){if(f.h != null) number(f.h,0,10,'extractor head count',true);}
+                    else {
+                        if(f.n != null) number(f.n,0,1000000,'factory count',true);
+                        if(f.a != null) number(f.a,1,1000000,'factory cycle interval');
+                    }
+                });
+            });
+        });
+    }
     function decode(data){
-        if (!data || !Array.isArray(data.pl) || !data.pl.length) throw new Error('Saved setup was not found');
+        validate(data);
         return {marketId:String(data.is || 10000002),exportMarketId:String(data.es || 10000002),
             importOrderType:data.io || 'buy',exportOrderType:data.eo || 'buy',
             importStatistic:statistic(data.im),exportStatistic:statistic(data.em || data.ex),

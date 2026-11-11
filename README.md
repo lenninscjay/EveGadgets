@@ -106,3 +106,9 @@ It preserves the current PI dataset, corrected cargo volumes, Fuzzwork integrati
 persistent market cache, and saved-setup database. The classic planner remains available.
 See [reconstruction notes](docs/eve-pi-reconstruction.md) for provenance, differences,
 validation limits and local checks. Historic eve-pi.com save IDs cannot be recovered.
+
+The reconstruction also provides **JSON backup / restore**: download a setup file,
+or paste/open JSON and select **Replace setup from JSON**. This works independently
+of server saves and preserves the compact format used by the classic planner.
+Keep downloaded files somewhere safe. Updating the app does not require deleting
+Docker volumes; use `docker compose up --build` without `down -v`.

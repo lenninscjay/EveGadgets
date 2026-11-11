@@ -22,7 +22,8 @@ establish a separate license for changes made by the later site operator.
 
 Recovered portions include the planet model, coordinator, navigation, overview,
 market and save panels, planet editor, and CSS. The factory editor template was
-missing and has been rebuilt. Archived API adapters have been replaced. The old
+missing and has been rebuilt. Overview icons use CCP's current image service, with
+visible commodity names even when images are unavailable. Archived API adapters have been replaced. The old
 analytics, missing Scrap scripts and obsolete image requests are removed.
 
 ## Progress retained from the localhost revival
@@ -54,11 +55,11 @@ analytics, missing Scrap scripts and obsolete image requests are removed.
 ## Verification and limits
 
 `node scripts/test-planner.js` checks the classic calculations. The reconstruction
-check uses the real generated AngularJS bundle and templates in jsdom, with HTTP
-fixtures matching the Java API schemas:
+check uses the real generated AngularJS bundle and templates in jsdom, with the actual seed/MyBatis/Jackson dataset exported by `PiDatabaseTest`:
 
 ```sh
-# Run a Maven build first to generate webapp/target/generated-resources/static.
+# Run mvn verify first to generate both the asset bundle and
+# ServiceLayer/target/pi-api-fixture.json from the database integration test.
 npm install --no-save --package-lock=false jsdom@31.0.0
 node scripts/test-reconstructed.js
 ```
@@ -68,7 +69,8 @@ not require Node. The test checks routing/templates, factory selection/removal,
 storage, volumes, hourly rates, independent prices, a single batched client request,
 current-origin save links, save/load, prerequisites, and data/price/save/load failures.
 It does not simulate provider caching; that remains covered by the existing Java
-market-cache tests. Test data is deliberately small and deterministic.
+market-cache tests. The recipe dataset is generated from the complete bundled PI seed, not manually
+constructed recipe fixtures. Price responses remain deterministic test fixtures.
 
 The modified persistence DTO was compiled to Java 8 bytecode with JDK 21's compiler,
 and its JSON round-trip was exercised with the application's Jackson 2.4.5 libraries.
@@ -97,3 +99,42 @@ remain suitable only for the previously described localhost scope.
    settings, taxes and command-center storage. Restart Compose and reload the link.
 6. Verify provider requests in server/network diagnostics: one full PI batch per market
    per cache interval, shared by both frontends, retained across normal Compose restarts.
+
+## JSON backup and restore
+
+Use **JSON backup / restore** in the top bar:
+
+- **Export current setup** puts the setup in a copyable text area.
+- **Download current setup (.json)** saves `evegadgets-setup.json` on your computer.
+- Open a `.json` file or paste a classic/reconstructed compact JSON export, then
+  select **Replace setup from JSON**. This replaces the current planets/settings;
+  export first to keep them. Invalid files leave the current setup untouched.
+- Import validates commodity IDs, factory tiers, counts, utilization and options.
+  The file/text limit is 2 MB. It restores the plan without a database write or
+  market lookup; prices refresh when you open Market Details. The app must already
+  have loaded its PI dataset. JSON files do not contain price-cache snapshots.
+
+**Save current setup** remains available and stores a database record with a link,
+not a new HTML file. Reopening the homepage does not automatically reload that record;
+use its saved URL. The configured `eve-data` volume should survive normal restarts and
+`docker compose down`. `docker compose down -v`, deleting the volume, or running under
+another Compose project name can remove or select a different database. No deletion
+or volume reset is required for this update. JSON backups are independent of the
+server database and should be kept outside the repository/container.
+
+## Recipe regression correction
+
+The original `Schematics.xml` query joined all schematic rows, including the output,
+into the recipe ingredients. Restricting `B.isInput=1` prevents subtracting a product
+from itself and prevents **Add prerequisites** from recreating its triggering factory.
+There is also a client guard against self-inputs from an old/malformed response.
+Repeated clicks still add another set of input factories; this action does not globally
+balance or deduplicate factories already assigned to other consumers.
+
+The database test checks all 68 recipes (135 input rows, excluding 68 output rows),
+including exact Broadcast Node/P3 ingredient lists. The DOM test uses that serialized
+response to verify 20/hour of each required P2 imported, 6/hour of each P3 transferred
+between planets, and 1 Broadcast Node/hour exported. It also checks the Neocoms
+prerequisite action, JSON downloads/file imports/pasted imports, rejection without
+state loss, and readable icon headers. The database test was run with H2/MySQL mode,
+not a live MySQL container; Docker/reboot and visual-browser checks remain local.

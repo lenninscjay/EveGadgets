@@ -167,12 +167,9 @@ app.factory('Planet', ['FACILITIES', 'PRODUCT', 'LEVEL', 'PiDataModel',
 			this.ioFactoryHelper(this.factoriesBasic, 2);
 			this.ioFactoryHelper(this.factoriesAdvanced, 1);
 			this.ioFactoryHelper(this.factoriesHightech, 1);
-			angular.forEach(this.ioDetails, function(io){
-				if(io.quantity === 0){
-					var index = this.ioDetails.indexOf(io)
-					this.ioDetails.splice(index,1);
-				}
-			}, this)
+            // Do not splice while iterating: adjacent zero flows must all disappear.
+            this.ioDetails = this.ioDetails.filter(function(io){return io.quantity !== 0;});
+
 			angular.forEach(this.extractors, function(e){
 				// console.log("extractor helper: " + angular.toJson(e))
 				if(e.resourceId){
@@ -396,6 +393,8 @@ app.factory('Planet', ['FACILITIES', 'PRODUCT', 'LEVEL', 'PiDataModel',
 			var baseSchematic = PiData.getData().schematicMap[factory.schematic]
 			// console.log("baseSchematic: " + angular.toJson(baseSchematic));
 			angular.forEach(baseSchematic.recipe, function(component){
+                // Defensive guard for old/malformed datasets; output is never a prerequisite.
+                if (String(component.typeid) === String(baseSchematic.outputID)) return;
 				var componentData = PiData.getData().itemDetails[component.typeid];
 				var compschematic = PiData.getData().schematicMap[component.typeid];
 				// console.log("componentData: " + angular.toJson(componentData));

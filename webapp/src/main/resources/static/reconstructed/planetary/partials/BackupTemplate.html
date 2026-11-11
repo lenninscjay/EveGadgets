@@ -1,0 +1,12 @@
+<section class="container-fluid backup-panel">
+<h2>JSON backup / restore</h2>
+<p>Download a setup file or copy its JSON. Keep it on your computer to restore after a database reset or move it to another installation. No server save is required.</p>
+<button type="button" class="btn btn-primary" ng-click="exportJson()">Export current setup</button>
+<button type="button" class="btn btn-default" ng-click="downloadJson()">Download current setup (.json)</button>
+<label>Open setup file <input type="file" accept=".json,application/json" eg-setup-file="readSetupFile(file)"></label>
+<label>Setup JSON<textarea class="form-control" ng-model="backup.text" spellcheck="false"></textarea></label>
+<p>Import replaces the current planets and settings. Export first if you want to keep them. Classic EveGadgets JSON exports are also accepted.</p>
+<button type="button" class="btn btn-success" ng-click="importJson()">Replace setup from JSON</button>
+<p class="alert alert-danger" role="alert" ng-if="backup.error">{{backup.error}}</p>
+<p class="alert alert-success" role="status" ng-if="backup.message">{{backup.message}}</p>
+</section>

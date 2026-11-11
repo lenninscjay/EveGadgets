@@ -102,7 +102,9 @@
 							<span class="alertTooltip" tooltip="{{DATA.itemDetails[item.id].name}}"
 								tooltip-placement="top">
 
-								<!-- Use images -->
+								<img ng-src="https://images.evetech.net/types/{{item.id}}/icon?size=32"
+                                    width="32" height="32" alt="" loading="lazy">
+                                <span class="commodity-name">{{DATA.itemDetails[item.id].name}}</span>
 							</span>
 						</th>
 						<th><span>Import Tax/Hr</span></th>
@@ -127,7 +129,7 @@
 					</tr>
 					<tr> <!-- Break of some sort --> </tr>
 					<tr>
-						<td>Totals</td>
+						<td>Net external imports/exports</td>
 						<td ng-repeat="item in Logic.System.importExports">
 							<span ng-class="item.quantity > 0 ? 'exportColors' : 'importColors'">{{item.quantity}}</span>
 						</td>

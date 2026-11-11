@@ -289,14 +289,41 @@ app.factory('PlanetLogic',['$http', '$q', 'Planet', 'PiDataModel', 'MarketDataSe
         });
     };
     service.saveSetup = function(){return PersistHandler.saveSetup(service);};
+    function replaceSetup(saved){
+        ++requestVersion; // A pending response must not overwrite the imported setup's prices.
+        angular.forEach(saved,function(v,k){service[k] = v;});
+        len = service.planets.length;
+        service.loadedSetup = true;
+        service.failedLoad = false;
+        service.marketprices = {};
+        service.pricesReady = false;
+        service.marketCallOngoing = false;
+        service.marketError = '';
+        service.loadOverviewTab();
+    }
+    var loadVersion = 0;
+    service.exportJson = function(){
+        var encoded = PersistHandler.encode(service);
+        PersistHandler.decode(encoded); // Do not export an invalid or empty setup.
+        return JSON.stringify(encoded,null,2);
+    };
+    service.importJson = function(text){
+        if (typeof text !== 'string' || text.length > 2 * 1024 * 1024) throw new Error('Setup JSON must be under 2 MB.');
+        var data;
+        try { data = JSON.parse(text); } catch(error) { throw new Error('Invalid JSON. Paste or open a complete setup export.'); }
+        var decoded = PersistHandler.decode(data); // Validate fully before replacing anything.
+        ++loadVersion;
+        replaceSetup(decoded);
+        // Pricing is requested only when Market Details is opened, so import works offline.
+    };
     service.loadSetup = function(key){
+        var version = ++loadVersion;
         service.failedLoad = false;
         return PersistHandler.loadSetup(key).then(function(saved){
-            angular.forEach(saved,function(v,k){service[k] = v;});
-            len = service.planets.length;
-            service.loadedSetup = true;
+            if (version !== loadVersion) return;
+            replaceSetup(saved);
             return service.getMarketInfo();
-        },function(){service.failedLoad = true;});
+        },function(){if (version === loadVersion) service.failedLoad = true;});
     };
     // Only a cache warm-up: on expiry the next user action refreshes the batch.
     MarketService.warm(service.marketId).then(function(){},function(){

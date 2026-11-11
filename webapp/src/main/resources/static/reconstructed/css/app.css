@@ -160,3 +160,8 @@ body {
 	text-align: right;
 	font-family: initial !important;
 }
+
+.commodity-name { display:block; max-width:110px; white-space:normal; font-size:11px; }
+.backup-panel textarea { width:100%; min-height:220px; font-family:monospace; }
+.backup-panel label { display:block; margin-top:16px; }
+.backup-panel button { margin:8px 8px 8px 0; }
