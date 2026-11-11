@@ -12,7 +12,7 @@ From the repository directory in PowerShell or a terminal:
 docker compose up --build
 ```
 
-Wait for MySQL initialization and the Spring `Started Application` message, then open **http://localhost:8080/#/pi**. The first build needs internet access to download images and Maven dependencies; live prices always need internet access to `market.fuzzwork.co.uk`. PI reference data is included in the repository.
+Wait for MySQL initialization and the Spring `Started Application` message, then open **http://localhost:8080/**. The first build needs internet access to download images and Maven dependencies; live prices always need internet access to `market.fuzzwork.co.uk`. PI reference data is included in the repository.
 
 The app binds to loopback only. MySQL has no host port. Compose uses deliberately local-only credentials. This retains end-of-life frameworks for compatibility and is **not a public deployment configuration**.
 
@@ -100,10 +100,9 @@ Tests use an injected clock and fake provider to verify all-83 batching, cache r
 
 ### Reconstructed eve-pi.com interface
 
-An opt-in reconstruction of **Omarus Nagibatus's** archived interface is available at
-http://localhost:8080/reconstructed/index.html#/ after the same Docker startup.
+The default planner at http://localhost:8080/ reconstructs **Omarus Nagibatus's** archived interface.
 It preserves the current PI dataset, corrected cargo volumes, Fuzzwork integration,
-persistent market cache, and saved-setup database. The classic planner remains available.
+persistent market cache, and saved-setup database. The classic utility is available at http://localhost:8080/legacy.
 See [reconstruction notes](docs/eve-pi-reconstruction.md) for provenance, differences,
 validation limits and local checks. Historic eve-pi.com save IDs cannot be recovered.
 

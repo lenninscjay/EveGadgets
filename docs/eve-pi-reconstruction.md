@@ -1,13 +1,13 @@
 # eve-pi.com frontend reconstruction
 
-This opt-in frontend reconstructs the archived eve-pi.com interface associated with
+The default frontend reconstructs the archived eve-pi.com interface associated with
 **Omarus Nagibatus**, originally based on **Kurt Midas's EveGadgets**. It uses the
 current Java/MySQL backend rather than recreating the unavailable historical server.
 
 After `docker compose up --build`, open:
-http://localhost:8080/reconstructed/index.html#/
+http://localhost:8080/
 
-The classic planner remains at http://localhost:8080/#/pi and links to this interface.
+The classic planner remains at http://localhost:8080/legacy and links to this interface.
 No additional production services, package managers or host installations are needed.
 
 ## Recovered and rebuilt
@@ -45,8 +45,8 @@ analytics, missing Scrap scripts and obsolete image requests are removed.
   not presented as daily traded volume.
 - Saves use the existing `/persist` endpoints and compact schema in the same MySQL
   database. Classic saves can be opened with their numeric key at
-  `/reconstructed/index.html#/<key>`. Newly reconstructed saves also open in the classic
-  planner. Command-center storage now has a missing `c` property in the Java DTO.
+  `/#/<key>` or in the classic planner at `/legacy#/pi/<key>`. The old
+  `/reconstructed/index.html#/<key>` and `/#/pi/<key>` bookmarks still work. Command-center storage now has a missing `c` property in the Java DTO.
   Zero tax rates and false flags survive both frontends' load paths. Historical saves
   with omitted market fee fields cannot be distinguished from explicit zero fees by
   the legacy Java primitive fields; these now load as the stored zero values.

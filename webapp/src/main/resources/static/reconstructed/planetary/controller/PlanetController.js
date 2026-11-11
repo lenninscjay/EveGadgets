@@ -40,7 +40,7 @@ app.controller('planetAppController', ['$scope', 'PlanetLogic', 'DATA', 'LEVEL',
 	$scope.MARKETS = MARKET_IDS;
 
 
-	$scope.baseUrl = window.location.origin + window.location.pathname + "#/"; //unsafe?
+	$scope.baseUrl = window.location.origin + "/#/";
 	// $scope.baseUrl = "http://www.eveGadgets.com/#/pi/";
 	$scope.saveKey = '';
 
@@ -60,7 +60,7 @@ app.controller('planetAppController', ['$scope', 'PlanetLogic', 'DATA', 'LEVEL',
     $scope.baseMenu.backup = function(){ $scope.activeView = 'BACKUP'; };
     $scope.openBroadcastTemplate = function(){
         $scope.backup.error = ''; $scope.backup.message = '';
-        return $http.get('templates/broadcast-node.json').then(function(response){
+        return $http.get('/reconstructed/templates/broadcast-node.json').then(function(response){
             $scope.backup.text = JSON.stringify(response.data,null,2);
             $scope.backup.message = 'Broadcast Node template opened. Export your current plan first, then choose Replace setup from JSON. Default extraction yields leave P0 shortfalls; adjust them to your estimates.';
         },function(){ $scope.backup.error = 'Could not load the Broadcast Node template.'; });

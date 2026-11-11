@@ -2,7 +2,7 @@ var app = angular.module('gadgets', ['ngRoute','PlanetaryGadget','PlanetData']);
 
 var planetaryRoute = {
 			appName : "PI Planning Made Simple",
-			templateUrl : 'planetary/piGadgetIndex.html',
+			templateUrl : '/reconstructed/planetary/piGadgetIndex.html',
 			controller : 'planetAppController',
 			resolve: {
 				'DATA' : function(PiDataService, PiDataModel){

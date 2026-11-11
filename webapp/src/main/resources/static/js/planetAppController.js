@@ -6,15 +6,15 @@ var app = angular.module('planetApp', ['ui.bootstrap',
 app.config(function($routeProvider, $httpProvider) {
 	$routeProvider.
 		when('/pi', {
-			templateUrl: 'PIGadget/PIApp.html',
+			templateUrl: '/PIGadget/PIApp.html',
 			controller: 'planetAppController',
 		}).
 		when('/pi/:planetKey', {
-			templateUrl: 'PIGadget/PIApp.html',
+			templateUrl: '/PIGadget/PIApp.html',
 			controller: 'planetAppController',
 		}).
 		when('/scrap',{
-			templateUrl: 'ScrapGadget/Scrap.html',
+			templateUrl: '/ScrapGadget/Scrap.html',
 			controller: 'scrapGadgetController',
 		}).
 		otherwise({

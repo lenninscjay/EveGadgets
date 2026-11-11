@@ -2,7 +2,7 @@ app.directive('egFactoryManager',['PiDataModel', function (DATA) {
     return {
         restrict: 'E',
 
-        templateUrl: 'planetary/partials/factoryTemplate.html',
+        templateUrl: '/reconstructed/planetary/partials/factoryTemplate.html',
 
         replace: true,
 
