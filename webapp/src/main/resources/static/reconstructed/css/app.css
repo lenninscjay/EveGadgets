@@ -1,0 +1,167 @@
+/* app css stylesheet */
+/*
+.menu {
+  list-style: none;
+  border-bottom: 0.1em solid black;
+  margin-bottom: 2em;
+  padding: 0 0 0.5em;
+}
+
+.menu:before {
+  content: "[";
+}
+
+.menu:after {
+  content: "]";
+}
+
+.menu > li {
+  display: inline;
+}
+
+.menu > li:before {
+  content: "|";
+  padding-right: 0.3em;
+}
+
+.menu > li:nth-child(1):before {
+  content: "";
+  padding: 0;
+} */
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+	-moz-appearance: textfield;
+}
+
+.nav-pills-condensed {
+	padding-top: 8px !important;
+	padding-bottom:6px !important;
+	padding-right:0px !important;
+	font-size: 17px;
+}
+
+.strong {
+	font-weight:bold;
+}
+
+.navSection{
+	text-align: center;
+	margin-top: 10px;
+	margin-bottom: 5px;
+	/* padding-right: 30px; */
+}
+
+.alertTooltip{
+	padding: 0px 7px;
+}
+
+.navbarColor {
+	background-color: #eeeeee;
+}
+.navbar-default {
+	background-color: #eeeeee;
+}
+
+.generalBackgroundColor {
+	background-color:#fafafa;
+}
+
+#piNavColumn {
+	/*background-color: #f8f8f8;*/
+	height:100%;
+	padding:15px;
+}
+
+html, body, .container-fluid, .full {
+	height:100%;
+	min-height:100%;
+}
+
+body {
+	font-family: Coda !important;
+}
+
+.navbar-static-top {
+	margin-bottom : 0px !important;
+}
+
+.borderless {
+	padding: 0;
+}
+
+
+
+.barContainer{
+	padding:6px;
+}
+
+.customHeader{
+	position:relative;
+	min-height:1px;
+	padding-right:15px;
+	padding-left: 15px;
+	padding-bottom:2px;
+	margin:10px 0 10px;
+	border-bottom:1px solid #eee;
+}
+
+
+.utilizationField{
+	width:60px !important;
+	padding-left:10px;
+	margin-left:10px;
+	display:inline;
+	line-height:1;
+	margin-left: 70px;
+}
+.generalTextColor {
+	color: #006000;
+}
+.importColors{
+	color: darkorange;
+}
+.exportColors{
+	color: blue;
+}
+.interactableColor{
+	color: #337ab7;
+}
+.errorText{
+	color: red;
+}
+.denseCell {
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	text-align: center !important;
+}
+.textRight {
+	text-align:right;
+}
+
+
+
+
+
+/*
+	Scrap CSS
+*/
+.subTable{
+	color: green;
+	font-size: 90%;
+	text-align: right;
+}
+.price {
+	text-align: right;
+	font-family: initial !important;
+}
+
+.commodity-name { display:block; max-width:110px; white-space:normal; font-size:11px; }
+.backup-panel textarea { width:100%; min-height:220px; font-family:monospace; }
+.backup-panel label { display:block; margin-top:16px; }
+.backup-panel button { margin:8px 8px 8px 0; }

@@ -8,6 +8,9 @@ public class PlanetSetupContainer {
 	private List<FactorySetupContainer> h;
 	private List<ExtractorSetupContainer> e;
 	
+	private Boolean c;
+	public Boolean getC() { return c; }
+	public void setC(Boolean c) { this.c = c; }
 	private Integer s; //storagefacilities
 	private Integer p; //pads
 	private Boolean r; //restrictPads

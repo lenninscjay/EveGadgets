@@ -37,3 +37,24 @@ const saved=scope.generateSavePlanetJson();
 assert.equal(saved.em,'max');assert.equal(saved.ex,undefined);
 scope.populateSetupFromJson(saved);assert.equal(scope.ex_marketStatType,'max');
 console.log('Planner checks passed: storage, volume, hourly inputs, runtime, tax, price selectors and save round-trip');
+
+// Reconstructed saves explicitly preserve zero rates and false flags.
+const zeroSave=JSON.parse(JSON.stringify(saved));
+zeroSave.ib=0;zeroSave.eb=0;zeroSave.it=0;zeroSave.et=0;
+zeroSave.pl[0].t=0;zeroSave.pl[0].l=0;zeroSave.pl[0].r=false;
+scope.populateSetupFromJson(zeroSave);
+assert.equal(scope.planets[0].taxRate,0);
+assert.equal(scope.planets[0].level,0);
+assert.equal(scope.planets[0].restrictPads,false);
+assert.equal(scope.im_brokerfees,0);assert.equal(scope.ex_brokerfees,0);
+console.log('Cross-frontend save checks passed: zero rates and false flags');
+
+// Yield fields survive passing through the classic planner and affect raw-material flows.
+scope.data.itemDetails[2268].name='Aqueous Liquids';scope.data.nameMap['Aqueous Liquids']=2268;
+const classicPlanet=scope.planets[0];
+classicPlanet.extractors=[{resourceId:'Aqueous Liquids',headcount:1,yieldPerHour:2000}];
+classicPlanet.updateImportExports();assert.equal(classicPlanet.importExport[2268].quantity,-4000);
+const yieldSave=scope.generateSavePlanetJson();assert.equal(yieldSave.pl[0].e[0].y,2000);
+scope.populateSetupFromJson(yieldSave);assert.equal(scope.planets[0].extractors[0].yieldPerHour,2000);
+scope.planets[0].extractors[0].yieldPerHour=0;scope.planets[0].updateImportExports();assert.equal(scope.planets[0].importExport[2268].quantity,-6000);
+console.log('Classic yield checks passed: P0 deficit and save/load field preservation');

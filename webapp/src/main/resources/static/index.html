@@ -1,132 +1,70 @@
-<!doctype html>
-<html ng-app="planetApp" >
+<!DOCTYPE html>
+<html lang="en" ng-app="gadgets">
 <head>
-<title>PI Gadget</title>
-<link rel="shortcut icon" type="image/png" href="images/fullyTrained.png"/>
+    <script>
+        // Old bookmarks used the root URL with a classic planner or scrap hash.
+        if (/^#\/(?:pi|scrap)(?:[/?]|$)/.test(window.location.hash)) {
+            window.location.replace('/legacy' + window.location.hash);
+        }
+    </script>
+	<meta charset="utf-8">
+	<title>EVE PI planner</title>
+	<link rel="shortcut icon" type="image/png" href="/images/fullyTrained.png">
+	<meta name="description" content="EVE Planetary Industry (PI) planner and calculator">
+	<meta name="author" content="Kurt Midas">
+	<meta name="keywords" content="eve online, planetary interaction, Planetary Industry, PI, PI Chain, PI tool">
+	<link rel="stylesheet" href="/css/angular-bootstrap.css">
+<script src="/js/angular-bootstrap.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
-<script src="js/angular-bootstrap.js" type="text/javascript"></script>
+	<link href='https://fonts.googleapis.com/css?family=Coda' rel='stylesheet' type='text/css'>
 
-<!-- PIGadget Fundamentals -->
-<script src="js/planetAppController.js"></script>
-<script src="js/util.js"></script>
+	<link rel="stylesheet" href="/reconstructed/css/app.css">
 
+	<!-- Global Imports and Configs (before the references) -->
+	<script src="/reconstructed/js/marketIDs.js" type="text/javascript"></script>
+	<script src="/reconstructed/js/MarketService.js" type="text/javascript"></script>
 
+	<!-- Planet Gadget Stuff -->
+	<script src="/reconstructed/planetary/services/PlanetData.js" type="text/javascript"></script>
+	<script src="/reconstructed/planetary/services/Planet.js" type="text/javascript"></script>
+	<script src="/reconstructed/planetary/services/Persist.js" type="text/javascript"></script>
+	<script src="/reconstructed/planetary/services/Logic.js" type="text/javascript"></script>
+	<script src="/reconstructed/planetary/controller/PlanetController.js" type="text/javascript"></script>
 
-<!-- ScrapGadget Fundamentals -->
-<script src="ScrapGadget/controllers/scrapGadgetController.js"></script>
+	<!-- Planet Gadget Directives -->
+	<script src="/reconstructed/planetary/directives/planetDirective.js" type="text/javascript"></script>
+	<script src="/reconstructed/planetary/directives/factoryDirective.js" type="text/javascript"></script>
+	<script src="/reconstructed/planetary/directives/HelpDirective.js" type="text/javascript"></script>
+	<script src="/reconstructed/planetary/directives/MarketpanelDirective.js" type="text/javascript"></script>
+	<script src="/reconstructed/planetary/directives/InfopanelDirective.js" type="text/javascript"></script>
+	<script src="/reconstructed/planetary/directives/SaveDirective.js" type="text/javascript"></script>
 
-<link href="css/angular-bootstrap.css" rel="stylesheet"/>
-<link rel="stylesheet" type="text/css" href="css/customCSS.css"/>
-<link rel="stylesheet" type="text/css" 
-	href="//fonts.googleapis.com/css?family=Coda"/>
-<!-- CDN Resources -->
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-	
-<!--Directives, Templates, Controllers-->
-<script src="PIGadget/directives/planetDirective.js"></script>
-<script src="PIGadget/directives/infopanelDirective.js"></script>
-<script src="PIGadget/directives/factoryDirective.js"></script>
-<script src="PIGadget/modals/saveSetupDirective.js"></script>
-<script src="PIGadget/modals/loadSetupDirective.js"></script>
-<script src="PIGadget/modals/aboutDirective.js"></script>
-<script src="PIGadget/modals/planetHelpDirective.js"></script>
-<script src="PIGadget/modals/confirmResetDirective.js"></script>
+	<!-- Scrap Gadget Stuff -->
 
-<!--Factories/Services-->
-<script src="PIGadget/api/planetApi.factory.js"></script>
-<script src="js/regionListUtil.js"></script>
-
-
-
-
-<!--  -->
+	<!-- Global Imports and Configs (after the references) -->
+	<script src="/reconstructed/js/conf.js" type="text/javascript"></script>
 
 </head>
 
-<body ng-cloak class="ng-cloak background">
-	<div class="navbar navbar-fixed-top barColors">
-         	<span class="navbar-brand">
-                PI Planning Made Simple
-            </span>
-            
-            <span class="navbar-brand pull-right">
-            
-            	<!-- 
-            	<button class="btn btn-success" 
-            	aria-controls="about-panel"
-            	aria-expanded="false"
-            	onclick=";return false;">
-            		About
-            	</button>
-            	
-            	<span 
-            	id="about-panel"
-            	style="width:230px; height:auto; max-height:100%; position:fixed">
-            		This is a panel thing
-            	</span>
-            	 -->
-            	 
-            	 <!-- <button class="btn btn-success"
-            	 	ng-click="aboutPanelVisible = !aboutPanelVisible">
-            	 	About
-            	 </button> -->
-            
-        		Eve Gadgets<sup style="color:blue; font-family:cursive">Beta</sup>
-            </span>
-	</div>
-	
-	<!-- <span class="col-xs-5 bs-docs-sidebar barColors pull-right about-sidebar"
-		ng-init="aboutPanelVisible=false"
-		ng-class="{'about-sidebar-expanded': aboutPanelVisible}">
-	    style="position: fixed; z-index:100; right:0; top:50; padding-top:50px; min-width:280px" 
-	    	ng-class="{'progress-bar-striped active': IsBigger(p.CPU, cclevel[p.level].CPU)}"
-	    	<h4>Useful Links</h4>
-	    	<ul>
-	    	<li><a href="http://eveplanets.com/" target='_blank'>EvePlanets.com</a></li>
-	    	<li><a href="http://wiki.eveuniversity.org/Planetary_Interaction" target='_blank'>Eve University: Planetary Interaction</a></li>
-	    	<li><a href="http://alysii.com/eve/pi/" target='_blank'>Alysii's PI Scheme</a></li>
-	    	<li><a href="http://wiki.eveuniversity.org/Epithal#Fitting" target='_blank'>Eve Univerity: Epithal</a> - quad stabs is arguably better</li>
-	    	<li><a href="http://games.chruker.dk/eve_online/market.php?group_id=1332" target='_blank'>Chruker: About PI Materials</a></li>
-	    	<li><a href="https://soundcloud.com/liam-conway-11/advanced-pi" target='_blank'>Liam Conway: Advanced PI Class</a></li>
-	    	</ul>
-	    	<h4 style="padding-top:30px">About me</h4>
-	    	<h5><a href='https://github.com/Kurt-Midas/EveGadgets' target='_blank'>Project Github</a></h5>
-	    	<h5><a href='https://secure.eveonline.com/trial/?invc=9e8adfef-08b9-486c-b43b-c8733b49e46a&action=buddy' 
-	    		target='_blank'>Obligatory referral link</a></h5>
-	    	<h5>[04:26:71] <b>Kurt Midas</b> > 
-	    		send me feedback and I'll implement it for free check my bio</h5>	    	
-	    	
-	    	
-	</span> -->
+<body ng-controller="baseController" class="generalBackgroundColor generalTextColor">
+	<nav class="navbar navbar-default navbar-static-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand">EVE Planetary Industry (PI) planner and profit calculator</a>
+			</div>
 
-	<div ng-view class="generalTextColor" style="margin-top:50px"></div>
+                        <span class="btn-group pull-right" style="padding-top: 8px; padding-bottom: 8px;">
+                            <button type="button" class="btn btn-default btn-md" ng-click="baseMenu.backup()">JSON backup / restore</button>
+                            <button type="button" class="btn btn-success btn-md" ng-click="baseMenu.save()">Save current setup</button>
+                        </span>
+		</div>
+	</nav>
+
+	<p class="alert alert-danger" ng-if="routeError">{{routeError}}</p>
+<a href="/legacy">Legacy planner</a> · Reconstructed eve-pi.com interface
+<div id="gadgetsView" ng-view></div>
 
 </body>
 
-<script>
-$(document).ready(function(){
-    $('[data-toggle="popover"]').popover();
-    
-    /* $("#aboutPopover").popover({
-    	html: true,
-    	content: function() {
-    		return $('aboutPopoverContent').html();
-    	},
-    	title: function() {
-    		return $("hello");
-    	}
-    }) */
-});
-
-
-
-</script>
-
 </html>
-
-<!-- Credits
-http://jsfiddle.net/KyleMit/v6zhz/52/light/
-https://github.com/shpoont/bootstrap-arrow-buttons
-
-
- -->

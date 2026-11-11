@@ -12,7 +12,7 @@ From the repository directory in PowerShell or a terminal:
 docker compose up --build
 ```
 
-Wait for MySQL initialization and the Spring `Started Application` message, then open **http://localhost:8080/#/pi**. The first build needs internet access to download images and Maven dependencies; live prices always need internet access to `market.fuzzwork.co.uk`. PI reference data is included in the repository.
+Wait for MySQL initialization and the Spring `Started Application` message, then open **http://localhost:8080/**. The first build needs internet access to download images and Maven dependencies; live prices always need internet access to `market.fuzzwork.co.uk`. PI reference data is included in the repository.
 
 The app binds to loopback only. MySQL has no host port. Compose uses deliberately local-only credentials. This retains end-of-life frameworks for compatibility and is **not a public deployment configuration**.
 
@@ -97,3 +97,22 @@ The API page does not state a numeric aggregate-request quota. Our 30-minute lif
 - The legacy Scrap path can include non-PI types, producing a separate batch/cache key; the above one-batch behavior is for the supported PI planner.
 
 Tests use an injected clock and fake provider to verify all-83 batching, cache reuse, expiration, separate locations, simultaneous callers, and provider cooldown without making network requests.
+
+### Reconstructed eve-pi.com interface
+
+The default planner at http://localhost:8080/ reconstructs **Omarus Nagibatus's** archived interface.
+It preserves the current PI dataset, corrected cargo volumes, Fuzzwork integration,
+persistent market cache, and saved-setup database. The classic utility is available at http://localhost:8080/legacy.
+See [reconstruction notes](docs/eve-pi-reconstruction.md) for provenance, differences,
+validation limits and local checks. Historic eve-pi.com save IDs cannot be recovered.
+
+The reconstruction also provides **JSON backup / restore**: download a setup file,
+or paste/open JSON and select **Replace setup from JSON**. This works independently
+of server saves and preserves the compact format used by the classic planner.
+Keep downloaded files somewhere safe. Updating the app does not require deleting
+Docker volumes; use `docker compose up --build` without `down -v`.
+
+The JSON menu includes a **Broadcast Node template** for the full P0→P4 chain
+(12 planets, target one node/hour). Extractors have editable **Total yield/hr**
+estimates, initially 12,000; the overview reports P0 shortfalls and surpluses.
+Adjust the template's extraction estimates or cover the indicated deficits with imports.

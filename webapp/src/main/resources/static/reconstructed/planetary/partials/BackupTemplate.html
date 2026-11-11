@@ -1,0 +1,17 @@
+<section class="container-fluid backup-panel">
+<h2>JSON backup / restore</h2>
+<h3>Broadcast Node template</h3>
+<p>Target: 1 Broadcast Node/hour. Includes one P4 planet (1 high-tech factory), one P3 planet (6 advanced factories), one P2 planet (24 advanced factories), and nine P0/P1 planets (48 basic factories total). Each extractor defaults to 12,000 units/hour; review the resulting P0 shortfalls and adjust yield estimates. Ten heads per extractor and level-V command centers are initial fitting assumptions.</p>
+<button type="button" class="btn btn-default" ng-click="openBroadcastTemplate()">Open Broadcast Node template</button>
+<a href="/reconstructed/templates/broadcast-node.json" download="broadcast-node.json">Download template (.json)</a>
+<hr>
+<p>Download a setup file or copy its JSON. Keep it on your computer to restore after a database reset or move it to another installation. No server save is required.</p>
+<button type="button" class="btn btn-primary" ng-click="exportJson()">Export current setup</button>
+<button type="button" class="btn btn-default" ng-click="downloadJson()">Download current setup (.json)</button>
+<label>Open setup file <input type="file" accept=".json,application/json" eg-setup-file="readSetupFile(file)"></label>
+<label>Setup JSON<textarea class="form-control" ng-model="backup.text" spellcheck="false"></textarea></label>
+<p>Import replaces the current planets and settings. Export first if you want to keep them. Classic EveGadgets JSON exports are also accepted.</p>
+<button type="button" class="btn btn-success" ng-click="importJson()">Replace setup from JSON</button>
+<p class="alert alert-danger" role="alert" ng-if="backup.error">{{backup.error}}</p>
+<p class="alert alert-success" role="status" ng-if="backup.message">{{backup.message}}</p>
+</section>
