@@ -112,3 +112,8 @@ or paste/open JSON and select **Replace setup from JSON**. This works independen
 of server saves and preserves the compact format used by the classic planner.
 Keep downloaded files somewhere safe. Updating the app does not require deleting
 Docker volumes; use `docker compose up --build` without `down -v`.
+
+The JSON menu includes a **Broadcast Node template** for the full P0→P4 chain
+(12 planets, target one node/hour). Extractors have editable **Total yield/hr**
+estimates, initially 12,000; the overview reports P0 shortfalls and surpluses.
+Adjust the template's extraction estimates or cover the indicated deficits with imports.

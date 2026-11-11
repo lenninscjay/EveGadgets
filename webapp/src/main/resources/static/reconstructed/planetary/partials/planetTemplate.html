@@ -222,7 +222,22 @@
 						  </button>
 					  </span>
 					</span>
+                    <label class="extractor-yield">Total yield/hr
+                        <input type="number" min="0" step="any" class="form-control" style="width:150px"
+                            ng-model="e.yieldPerHour" ng-change="p.refreshImportExports()">
+                    </label>
 				</div>
+                <p>Yield is the total P0 units per hour for each extractor control unit, across all its heads. It is an estimate, not calculated from the head count.</p>
+                <p class="text-danger" ng-if="p.invalidExtractorYield">Enter a nonnegative yield for every extractor. An invalid value is currently treated as zero.</p>
+                <table class="table table-condensed" ng-if="p.extractionBalance.length">
+                    <tr><th>P0 resource</th><th>Yield/hr</th><th>Factory need/hr</th><th>Shortfall/hr</th><th>Surplus/hr</th></tr>
+                    <tr ng-repeat="balance in p.extractionBalance">
+                        <td>{{DATA.itemDetails[balance.id].name}}</td><td>{{balance.yieldPerHour | number}}</td>
+                        <td>{{balance.demand | number}}</td><td class="text-danger">{{balance.shortfall | number}}</td>
+                        <td>{{balance.surplus | number}}</td>
+                    </tr>
+                </table>
+
 			</div>
 
 

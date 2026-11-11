@@ -1,7 +1,7 @@
 var app = angular.module('PlanetaryGadget', ['PlanetCoordinator', 'PlanetData', 'ui.bootstrap', 'MarketConstants', 'ngRoute']);
 
-app.controller('planetAppController', ['$scope', 'PlanetLogic', 'DATA', 'LEVEL', 'PRODUCT', 'PLANETNAME', 'MARKET_IDS', '$routeParams',
-                                       function($scope, PlanetLogic, DATA, LEVEL, PRODUCT, PLANETNAME, MARKET_IDS, $routeParams){
+app.controller('planetAppController', ['$scope', 'PlanetLogic', 'DATA', 'LEVEL', 'PRODUCT', 'PLANETNAME', 'MARKET_IDS', '$routeParams', '$http',
+                                       function($scope, PlanetLogic, DATA, LEVEL, PRODUCT, PLANETNAME, MARKET_IDS, $routeParams, $http){
 
 
 	$scope.utilizationMessage =
@@ -58,6 +58,13 @@ app.controller('planetAppController', ['$scope', 'PlanetLogic', 'DATA', 'LEVEL',
 
     $scope.backup = {text:'', error:'', message:''};
     $scope.baseMenu.backup = function(){ $scope.activeView = 'BACKUP'; };
+    $scope.openBroadcastTemplate = function(){
+        $scope.backup.error = ''; $scope.backup.message = '';
+        return $http.get('templates/broadcast-node.json').then(function(response){
+            $scope.backup.text = JSON.stringify(response.data,null,2);
+            $scope.backup.message = 'Broadcast Node template opened. Export your current plan first, then choose Replace setup from JSON. Default extraction yields leave P0 shortfalls; adjust them to your estimates.';
+        },function(){ $scope.backup.error = 'Could not load the Broadcast Node template.'; });
+    };
     $scope.exportJson = function(){
         $scope.backup.error = '';
         try {

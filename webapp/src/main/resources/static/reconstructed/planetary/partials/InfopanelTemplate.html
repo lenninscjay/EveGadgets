@@ -1,4 +1,5 @@
 <div class="container-fluid">
+<p>Factory flows assume their configured operating rates. Extractor yield is subtracted from P0 demand: negative P0 flow is a shortfall to import or cover with more extraction. Factory output is not automatically throttled.</p>
 	<div class="row" style="padding-top:20px">
 			<div class="panel panel-default">
 				<div class="panel-heading">
@@ -183,7 +184,11 @@
 					 </div>
 				</div>
 				<div class="col-md-6 col-sm-12">
-					<h2 class="headerTextColor">Imports and Exports</h2>
+					<p class="text-danger" ng-if="p.invalidExtractorYield">An extractor yield is invalid and is being treated as zero.</p>
+                    <p ng-repeat="balance in p.extractionBalance" ng-if="balance.shortfall > 0" class="text-danger">
+                        {{DATA.itemDetails[balance.id].name}} extraction shortfall: {{balance.shortfall / p.cyclesPerActiveCycle | number}} units/hour (average).
+                    </p>
+                    <h2 class="headerTextColor">Imports and Exports</h2>
 					<table class="table table-condensed" style="border-top:0px">
 						<tr>
 							<th>Item</th>

@@ -116,7 +116,7 @@ app.factory('Planet', ['FACILITIES', 'PRODUCT', 'LEVEL', 'PiDataModel',
 		},
 		addExtractor: function(){
 			//console.log("Inside Planet.addExtractor");
-			this.extractors.push({resourceId: 0, headcount: 0});
+			this.extractors.push({resourceId: 0, headcount: 0, yieldPerHour: 12000});
 			this.refreshFitting();
 		},
 		deleteExtractor: function(e){
@@ -170,20 +170,30 @@ app.factory('Planet', ['FACILITIES', 'PRODUCT', 'LEVEL', 'PiDataModel',
             // Do not splice while iterating: adjacent zero flows must all disappear.
             this.ioDetails = this.ioDetails.filter(function(io){return io.quantity !== 0;});
 
-			angular.forEach(this.extractors, function(e){
-				// console.log("extractor helper: " + angular.toJson(e))
-				if(e.resourceId){
-					var index = arrayObjectIndexOf(this.ioDetails, e.resourceId, "id")
-					if(index >= 0){
-						this.ioDetails.splice(index, 1);
-					} else {
-						this.ioDetails.push({
-							id: e.resourceId,
-							quantity: 0
-						})
-					}
-				}
-			}, this)
+            var balances = {};
+            this.invalidExtractorYield = false;
+            angular.forEach(this.extractors, function(e){
+                if (!e.resourceId) return;
+                var id = e.resourceId;
+                var index = arrayObjectIndexOf(this.ioDetails,id,'id');
+                if (!balances[id]) balances[id] = {id:id, demand:index < 0 ? 0 : Math.max(0,-this.ioDetails[index].quantity), yieldPerHour:0};
+                var yieldPerHour = e.yieldPerHour;
+                if (typeof yieldPerHour !== 'number' || !isFinite(yieldPerHour) || yieldPerHour < 0) {
+                    this.invalidExtractorYield = true;
+                    yieldPerHour = 0;
+                }
+                balances[id].yieldPerHour += yieldPerHour;
+                if (index >= 0) this.ioDetails[index].quantity += yieldPerHour;
+                else this.ioDetails.push({id:id,quantity:yieldPerHour});
+            },this);
+            this.extractionBalance = Object.keys(balances).map(function(id){
+                var balance = balances[id];
+                balance.shortfall = Math.max(0,balance.demand-balance.yieldPerHour);
+                balance.surplus = Math.max(0,balance.yieldPerHour-balance.demand);
+                return balance;
+            });
+            this.ioDetails = this.ioDetails.filter(function(io){return io.quantity !== 0;});
+
 			this.refreshRuntime();
 			this.refreshTaxes();
 		},
@@ -414,7 +424,7 @@ app.factory('Planet', ['FACILITIES', 'PRODUCT', 'LEVEL', 'PiDataModel',
 					//add extractor after checking whether you can
 					if(arrayObjectIndexOf(this.resourceDatalist, component.typeid, "id") >= 0){
 						// console.log("adding extractor");
-						this.extractors.push({resourceId:component.typeid, headcount: 0}); // no idea why this is different
+						this.extractors.push({resourceId:component.typeid, headcount: 0, yieldPerHour: 12000}); // no idea why this is different
 						//this.refreshFitting();
 						//this.refreshAllowedPlanets();
 						//this.refreshImportExports();
@@ -456,7 +466,7 @@ app.factory('Planet', ['FACILITIES', 'PRODUCT', 'LEVEL', 'PiDataModel',
 				newPlanet.factoriesHightech.push({schematic:factory.schematic, number:factory.number, avgActiveCycles: factory.avgActiveCycles});
 			})
 			angular.forEach(this.extractors, function(e){
-				newPlanet.extractors.push({resourceId: e.resourceId, headcount: e.headcount});
+				newPlanet.extractors.push({resourceId: e.resourceId, headcount: e.headcount, yieldPerHour: e.yieldPerHour});
 			})
 			newPlanet.name = this.name + " copy";
 			newPlanet.numStorage = this.numStorage;

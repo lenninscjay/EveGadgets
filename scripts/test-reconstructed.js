@@ -113,6 +113,56 @@ function click(text){const el=[...w.document.querySelectorAll('button,a')].find(
  assert.equal(calls.length,callsBeforeImport);assert.equal(logic.pricesReady,false);
  assert.equal(logic.System.importExports.find(x=>x.id===2867).quantity,1);
  assert(w.document.body.textContent.includes('Setup imported'));
+ // Template uses the same import workflow and actual database recipe dataset.
+ click('Open Broadcast Node template');await settle();await settle();
+ const template=JSON.parse(backupScope.backup.text);
+ assert.equal(template.pl.length,12);
+ click('Replace setup from JSON');await settle();
+ assert.equal(logic.planets.length,12);
+ assert.equal(logic.planets.reduce((n,p)=>n+p.factoriesHightech.reduce((m,f)=>m+f.number,0),0),1);
+ assert.equal(logic.planets[1].factoriesAdvanced.reduce((n,f)=>n+f.number,0),6);
+ assert.equal(logic.planets[2].factoriesAdvanced.reduce((n,f)=>n+f.number,0),24);
+ assert.equal(logic.planets.reduce((n,p)=>n+p.factoriesBasic.reduce((m,f)=>m+f.number,0),0),48);
+ assert.equal(logic.System.importExports.find(x=>x.id===2867).quantity,1);
+ for(const flow of logic.System.importExports){
+   if(data.itemDetails[flow.id].tier>0 && flow.id!==2867)assert.equal(flow.quantity,0);
+ }
+ assert.equal(logic.System.importExports.filter(x=>data.itemDetails[x.id].tier===0).reduce((n,x)=>n-x.quantity,0),180000);
+ for(const planet of logic.planets){assert(planet.allowedPlanets.length>0);assert.equal(planet.isCpuOverloaded(),false);assert.equal(planet.isGridOverloaded(),false);}
+ const extraction=logic.planets.find(p=>p.factoriesBasic.length),raw=extraction.extractors[0].resourceId;
+ assert.equal(extraction.extractors[0].yieldPerHour,12000);
+ assert.equal(extraction.extractionBalance[0].demand,24000);
+ assert.equal(extraction.extractionBalance[0].shortfall,12000);
+ click(extraction.name);await settle();
+ const yieldInput=w.document.querySelector('.extractor-yield input');assert(yieldInput);
+ function setYield(amount){yieldInput.value=String(amount);yieldInput.dispatchEvent(new w.Event('input',{bubbles:true}));}
+ yieldInput.value='';yieldInput.dispatchEvent(new w.Event('input',{bubbles:true}));
+ assert.equal(extraction.invalidExtractorYield,true);assert.throws(()=>logic.exportJson(),/yield/);
+ setYield(24000);assert.equal(extraction.extractionBalance[0].shortfall,0);assert(!extraction.ioDetails.find(io=>io.id===raw));
+ setYield(25000);assert.equal(extraction.ioDetails.find(io=>io.id===raw).quantity,1000);
+ setYield(0);assert.equal(extraction.ioDetails.find(io=>io.id===raw).quantity,-24000);
+ assert.equal(extraction.getCopyOfThisPlanet().extractors[0].yieldPerHour,0);
+ setYield(12000);
+ extraction.extractors.push({resourceId:raw,headcount:1,yieldPerHour:12000});extraction.refreshImportExports();
+ assert.equal(extraction.extractionBalance.length,1);assert.equal(extraction.extractionBalance[0].shortfall,0);
+ extraction.extractors.pop();extraction.refreshImportExports();
+ // Cover exact-yield, deficit and surplus in system flows, then make the target self-sufficient.
+ for(const planet of logic.planets)for(const balance of planet.extractionBalance||[]){
+   planet.extractors.find(e=>e.resourceId==balance.id).yieldPerHour=balance.demand;planet.refreshImportExports();
+ }
+ logic.loadOverviewTab();
+ assert.equal(logic.System.importExports.filter(x=>x.quantity!==0).length,1);
+ assert.equal(logic.System.importExports.find(x=>x.id===2867).quantity,1);
+ const templateBackup=logic.exportJson();
+ logic.importJson(templateBackup);assert.equal(logic.planets.find(p=>p.factoriesBasic.length).extractors[0].yieldPerHour,24000);
+ // Legacy compact exports default missing yields; zero is preserved and invalid values are rejected.
+ const oldExtractor=persist.decode({pl:[{e:[{r:2268,h:1}]}]});assert.equal(oldExtractor.planets[0].extractors[0].yieldPerHour,12000);
+ assert.throws(()=>logic.importJson(JSON.stringify({pl:[{e:[{r:2268,y:-1}]}]})),/yield/);
+ const keepPlan=logic.planets;
+ assert.throws(()=>logic.importJson(JSON.stringify({pl:[{e:[{r:2268,y:'12000'}]}]})),/yield/);assert.equal(logic.planets,keepPlan);
+ click('Save current setup');await settle();await settle();
+ assert.equal(saved.pl.find(p=>p.e.length).e[0].y,24000);
+ logic.loadSetup('123');await settle();await settle();assert.equal(logic.planets.find(p=>p.extractors.length).extractors[0].yieldPerHour,24000);
  // Save failure should display the failure template, not an unhandled exception.
  failSave=true;click('Save current setup');await settle();await settle();
  assert(w.document.body.textContent.includes('not correctly saved'));
@@ -120,5 +170,5 @@ function click(text){const el=[...w.document.querySelectorAll('button,a')].find(
  failData=true;inj.get('$route').reload();rs.$digest();await settle();await settle();
  assert(w.document.body.textContent.includes('Could not load PI data'));
  assert.deepEqual(errors,[]);
- console.log('Reconstruction DOM checks passed: Angular routing/templates, editor, calculations, batching, independent prices, save/load, Broadcast Node transfers, prerequisites, JSON file/paste round-trip, invalid import isolation, icons and API failure states.');
+ console.log('Reconstruction DOM checks passed: Angular routing/templates, editor, calculations, batching, independent prices, save/load, Broadcast Node transfers, prerequisites, JSON file/paste round-trip, full P0-to-P4 template, extractor deficit/balance/surplus, yield persistence, icons and API failure states.');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>dom.window.close());

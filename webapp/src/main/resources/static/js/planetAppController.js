@@ -501,7 +501,13 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 				this.ImportExportUtil(f);
 			}, this);
 			angular.forEach(this.extractors, function(e){
-				delete this.importExport[$scope.data.nameMap[e.resourceId]];
+				var id = $scope.data.nameMap[e.resourceId];
+                if (id) {
+                    if (!this.importExport[id]) this.importExport[id] = {typeID:id,quantity:0};
+                    var yieldPerHour = e.yieldPerHour == null ? 12000 : e.yieldPerHour;
+                    if (typeof yieldPerHour === 'number' && isFinite(yieldPerHour) && yieldPerHour >= 0)
+                        this.importExport[id].quantity += yieldPerHour;
+                }
 			}, this);
 			//quantities
 			this.updateIOVolumes();
@@ -611,7 +617,7 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 			this.hightech.push({schematic:"", number:1, avgActiveCycles:1});
 		}
 		this.addExtractor = function(){
-			this.extractors.push({resourceId:'', headcount:0});
+			this.extractors.push({resourceId:'', headcount:0, yieldPerHour:12000});
 		}
 		this.removeStorage = function(){
 			this.storagefacilities -= 1;
@@ -685,7 +691,7 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 //							this.resourceDatalist
 							if(standardContains(this.resourceDatalist, name)){
 								console.log("adding extractor: " + m.typeId);
-								this.extractors.push({resourceId:name, headcount:0});
+								this.extractors.push({resourceId:name, headcount:0, yieldPerHour:12000});
 								this.updateImportExports();
 								this.updateCPU();
 								this.updateGrid();
@@ -696,7 +702,7 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 							}
 							
 							
-//							$scope.planets[id].extractors.push({resourceId: e.resourceId, headcount: e.headcount});
+//							$scope.planets[id].extractors.push({resourceId: e.resourceId, headcount: e.headcount, yieldPerHour:e.yieldPerHour});
 						}
 						else{
 							console.debug("YOU FUCKED UP BOY");
@@ -759,7 +765,7 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 //			console.log(f.schematic);
 		});
 		angular.forEach(planet.extractors, function(e){
-			$scope.planets[id].extractors.push({resourceId: e.resourceId, headcount: e.headcount});
+			$scope.planets[id].extractors.push({resourceId: e.resourceId, headcount: e.headcount, yieldPerHour:e.yieldPerHour});
 		});
 		$scope.planets[id].storagefacilities = planet.storagefacilities;
 		$scope.planets[id].launchpads = planet.launchpads;
@@ -1100,6 +1106,7 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 					var extractor = {};
 					if(ex.resourceId != "") {extractor.r = $scope.data.nameMap[ex.resourceId];}
 					if(ex.headcount != 0) {extractor.h = ex.headcount;}
+                    extractor.y = ex.yieldPerHour == null ? 12000 : ex.yieldPerHour;
 					p.e.push(extractor);
 				});
 			}
@@ -1190,11 +1197,12 @@ app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeP
 				planet.hightech.push(factory);
 			});
 			angular.forEach(p.e, function(e){
-				var extractor = {resourceId:'', headcount:0};
+				var extractor = {resourceId:'', headcount:0, yieldPerHour:12000};
 				if(e.r){
 					extractor.resourceId = $scope.data.itemDetails[e.r].name;
 				}
-				if(e.h){
+				if(e.y != null){extractor.yieldPerHour = e.y;}
+                if(e.h){
 					extractor.headcount = e.h;
 				}
 				planet.extractors.push(extractor);

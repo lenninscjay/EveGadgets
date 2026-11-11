@@ -82,8 +82,8 @@ not a claim to have recovered every feature of the historical site.
 Historic eve-pi.com/Mongo save IDs and its database are unavailable. Only locally
 saved numeric keys can be loaded. Tax/fee defaults are historical assumptions; enter
 your own rates. Planet detail figures are per active hour, while system totals account
-for utilization. The original extractor model assumes it supplies the required raw
-material; it does not simulate actual extraction yields. Old AngularJS/Spring dependencies
+for utilization. Extractor yields are user-entered estimates. The model shows net P0 deficits/surpluses
+but does not simulate depletion, extraction cycles, or automatic factory starvation. Old AngularJS/Spring dependencies
 remain suitable only for the previously described localhost scope.
 
 ## Local smoke check
@@ -138,3 +138,54 @@ between planets, and 1 Broadcast Node/hour exported. It also checks the Neocoms
 prerequisite action, JSON downloads/file imports/pasted imports, rejection without
 state loss, and readable icon headers. The database test was run with H2/MySQL mode,
 not a live MySQL container; Docker/reboot and visual-browser checks remain local.
+
+## Broadcast Node template and extractor estimates
+
+In **JSON backup / restore**, choose **Open Broadcast Node template**, then
+**Replace setup from JSON** when ready. Opening it first fills the editor without
+replacing your current plan. You can also download the template directly from that
+menu. The source is `static/reconstructed/templates/broadcast-node.json`; regenerate
+it from the current bundled seed with `python scripts/generate-broadcast-template.py`.
+
+The target is one Broadcast Node per hour, with this arrangement:
+
+| Stage | Planets | Facilities |
+|---|---:|---|
+| P4 | 1 | 1 high-tech factory for Broadcast Node |
+| P3 | 1 | 2 advanced factories each for Neocoms, Data Chips, High-Tech Transmitters |
+| P2 | 1 | 4 advanced factories for each of the 6 P2 inputs (24 total) |
+| P0/P1 | 9 | One planet per P1 commodity; 4 or 8 basic factories each (48 total), plus an extractor |
+
+The P1 commodities are Biofuels, Precious Metals, Oxidizing Compound, Silicon,
+Oxygen, Biomass, Industrial Fibers, Plasmoids and Chiral Structures. The template
+starts at command-center level V, one launchpad per planet, and ten heads per
+extractor. Tests check modeled CPU/PG fitting and nonempty allowed planet lists;
+actual placement/link lengths and extraction rates still need your own adjustment.
+It is a multi-character planning example, not a single-character colony allocation.
+
+Every extractor has **Total yield/hr**, default 12,000 P0 units per active planet
+hour across all of its heads. Head count affects fitting; it does not derive yield.
+Yield can be zero or a nonnegative number. The planet's utilization factor applies
+to the resulting flow when computing system averages, as it does for factory flows.
+Multiple extractors for the same P0 resource add together.
+
+At the default yields, the template deliberately exposes P0 deficits: six P1 planets
+need 24,000 P0/hour and three need 48,000 P0/hour, so each has a 12,000 or 36,000
+shortfall. Combined external P0 need is 180,000/hour. Raising each yield to its
+factory demand (or importing the deficit) supports the scheduled one-node/hour
+output. The overview shows shortages as negative P0 flows and explicit warnings;
+surplus extraction appears as positive P0 flow. Factory output is not silently
+throttled when extraction is insufficient.
+
+Yield uses the optional compact extractor field `y` and survives JSON/server saves,
+planet copies, and passing through the classic save format. Older saves without
+`y` default to 12,000; explicit zero stays zero. No database migration is needed.
+The reconstructed UI supports editing these estimates; the classic calculation and
+save adapter retain them too. Invalid/blank input is flagged and treated as zero
+while editing, and invalid imported yield values are rejected.
+
+Validation adds the complete 12-planet template, exact P2/P3/P4 balances, fitting,
+P0 deficit/balance/surplus, multiple extractors for one resource, yield edits,
+copying, JSON/server round-trips, legacy defaults, and zero/invalid yields. Two
+Jackson tests verify that the Java save DTO preserves custom/zero yields and accepts
+legacy records. Full Docker/MySQL reboot and visual-browser validation remain local.

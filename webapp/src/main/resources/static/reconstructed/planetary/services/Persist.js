@@ -9,6 +9,8 @@ angular.module('persistservice', ['PlanetModel']).service('persistHandler', ['$h
         t:'taxRate', l:'level', n:'avgLinkLength', v:'cyclesPerActiveCycle', f:'isFactoryPlanet', x:'name'};
     var defaults = {s:0,p:0,c:false,r:false,t:10,l:0,n:200,v:1,f:false,x:'Planet'};
     function encode(logic){
+        if (logic.planets.some(function(p){return p.invalidExtractorYield;}))
+            throw new Error('Enter a valid nonnegative yield for every extractor before saving or exporting.');
         return {is:+logic.marketId, es:+logic.exportMarketId, io:logic.importOrderType, eo:logic.exportOrderType,
             im:logic.importStatistic, em:logic.exportStatistic, ib:logic.importBrokerFees, eb:logic.exportBrokerFees,
             it:logic.taxRate, et:logic.taxRate, pl:logic.planets.map(function(p){
@@ -17,7 +19,7 @@ angular.module('persistservice', ['PlanetModel']).service('persistHandler', ['$h
                 angular.forEach({b:'factoriesBasic',a:'factoriesAdvanced',h:'factoriesHightech'}, function(name,key){
                     out[key] = p[name].map(function(f){return {s:+f.schematic || null,n:f.number,a:f.avgActiveCycles};});
                 });
-                out.e = p.extractors.map(function(e){return {r:+e.resourceId || null,h:e.headcount};});
+                out.e = p.extractors.map(function(e){return {r:+e.resourceId || null,h:e.headcount,y:value(e.yieldPerHour,12000)};});
                 return out;
             })};
     }
@@ -53,7 +55,10 @@ angular.module('persistservice', ['PlanetModel']).service('persistHandler', ['$h
                         if(!item || allowed.indexOf(item.tier) < 0 || (k !== 'e' && !Object.prototype.hasOwnProperty.call(recipes,id)))
                             throw new Error('Unknown commodity or wrong factory tier: ' + id);
                     }
-                    if(k === 'e'){if(f.h != null) number(f.h,0,10,'extractor head count',true);}
+                    if(k === 'e'){
+                        if(f.h != null) number(f.h,0,10,'extractor head count',true);
+                        if(f.y != null) number(f.y,0,1000000000000,'extractor yield per hour');
+                    }
                     else {
                         if(f.n != null) number(f.n,0,1000000,'factory count',true);
                         if(f.a != null) number(f.a,1,1000000,'factory cycle interval');
@@ -75,14 +80,16 @@ angular.module('persistservice', ['PlanetModel']).service('persistHandler', ['$h
                     p[name] = (saved[key] || []).map(function(f){return {schematic:f.s ? String(f.s) : '',
                         number:value(f.n,1),avgActiveCycles:value(f.a,1)};});
                 });
-                p.extractors = (saved.e || []).map(function(e){return {resourceId:value(e.r,0),headcount:value(e.h,0)};});
+                p.extractors = (saved.e || []).map(function(e){return {resourceId:value(e.r,0),headcount:value(e.h,0),yieldPerHour:value(e.y,12000)};});
                 p.refreshStorage();p.refreshImportExports();p.refreshAllowedPlanets();
                 return p;
             })};
     }
     return {encode:encode,decode:decode,
         saveSetup:function(logic){
-            return $http.post('/persist/saveSetup',encode(logic)).then(function(response){
+            var payload;
+            try { payload = encode(logic); } catch(error) { return $q.reject(error.message); }
+            return $http.post('/persist/saveSetup',payload).then(function(response){
                 if (response.data.KEY === undefined) return $q.reject('Save failed');
                 return response.data.KEY;
             });
