@@ -10,7 +10,7 @@ services:
       - eve-data:/var/lib/mysql
       - ./sql/local-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE -e 'SELECT COUNT(*) FROM invTypes' >/dev/null 2>&1"]
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD $$MYSQL_DATABASE -e 'SELECT 1 FROM invTypes LIMIT 1; SELECT 1 FROM planetSchematics LIMIT 1; SELECT 1 FROM planetSchematicsTypeMap LIMIT 1; SELECT 1 FROM planetaryResourceTypeMap LIMIT 1; SELECT 1 FROM planetSetupStorage LIMIT 1' >/dev/null 2>&1"]
       interval: 5s
       timeout: 5s
       retries: 30

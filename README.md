@@ -18,6 +18,34 @@ The app binds to loopback only. MySQL has no host port. Compose uses deliberatel
 
 To stop, press Ctrl+C, then optionally run `docker compose down`. Saved setups survive shutdown/rebuilds in the `eve-data` named volume. Do **not** run `docker compose down -v` unless you intend to delete all saved setups. Initialization SQL runs only on a new database volume. Export important setups as JSON before changing databases.
 
+If MySQL initialization stopped partway through, restart with a fresh Compose project to
+retry the bundled SQL while preserving the original volumes. Run `docker compose down`
+then `docker compose -p evegadgets-recovery up --build`. Use that same project name for
+subsequent starts and stops. The new project has its own database and cache, so setups
+saved in the original project will remain there. Python is only needed to regenerate the
+bundled SQL from the upstream data, not to initialize MySQL.
+
+If the database is healthy but `/planetary` returns HTTP 500, rebuild with the current
+code. The application must package Connector/J 8 (`com.mysql:mysql-connector-j`);
+the old Maven coordinates let Spring Boot downgrade downstream modules to 5.1.34,
+which cannot load the configured `com.mysql.cj.jdbc.Driver`. This repair does not
+require reseeding or deleting an already healthy database.
+
+Keep using the same Compose project name (for example `evegadgets-recovery2`): plain
+`docker compose up` selects a different database volume. To collect a complete error,
+run the following from the repository, replacing the project name if necessary:
+
+```sh
+docker compose -p evegadgets-recovery2 ps
+curl -sS -w '\nHTTP %{http_code}\n' http://localhost:8080/planetary
+docker compose -p evegadgets-recovery2 logs --no-color app > app-error.log
+docker compose -p evegadgets-recovery2 logs --no-color db > db-error.log
+```
+
+Keep the beginning of the exception and all `Caused by:` lines; a short log tail can
+omit the cause. The homepage and `/legacy` use the same `/planetary` endpoint.
+
+
 Docker Desktop needs virtualization/WSL 2 available on Windows. Practical allowance: several GB of disk for images/build caches and roughly 2–4 GB of available memory for Docker and the build (not measured requirements). Your 32 GB desktop should have ample capacity. Port 8080 must be free; if necessary change only the host side of `127.0.0.1:8080:8080` in `compose.yaml`.
 
 ## Scope and behavior
